@@ -104,15 +104,27 @@ int consume(int ty) {
   pos++;
   return 1;
 }
+Node *mul();
 Node *num();
+
 Node *expr() {
-  Node *node = num(); 
+  Node *node = mul(); 
+
   for (;;) {
     if (consume('+'))
-      node = new_node('+', node, num());
+      node = new_node('+', node, mul());
     else if (consume('-'))
-      node = new_node('-', node, num());
-    else if (consume('*'))
+      node = new_node('-', node, mul());
+    else
+      return node;
+  }
+}
+
+Node *mul() {
+  Node *node = num();
+
+  for (;;) {
+    if (consume('*'))
       node = new_node('*', node, num());
     else if (consume('/'))
       node = new_node('/', node, num());

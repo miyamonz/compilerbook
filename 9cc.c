@@ -46,7 +46,7 @@ void tokenize() {
       continue;
     }
 
-    if (*p == '+' || *p == '-' || *p == '*') {
+    if (*p == '+' || *p == '-' || *p == '*' || *p == '/') {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;
@@ -114,6 +114,8 @@ Node *expr() {
       node = new_node('-', node, num());
     else if (consume('*'))
       node = new_node('*', node, num());
+    else if (consume('/'))
+      node = new_node('/', node, num());
     else
       return node;
   }
@@ -147,6 +149,10 @@ void gen(Node *node) {
     break;
   case '*':
     printf("  imul rdi\n");
+    break;
+  case '/':
+    printf("  cqo\n");
+    printf("  idiv rdi\n");
     break;
   }
 

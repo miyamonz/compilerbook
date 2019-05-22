@@ -1,0 +1,9 @@
+version: "3"
+services:
+  9cc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/9cc
+    working_dir: /9cc

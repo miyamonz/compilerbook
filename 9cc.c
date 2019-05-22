@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,6 +16,25 @@ typedef struct {
 
 char *user_input;
 Token tokens[100];
+
+// エラーを報告するための関数
+// printfと同じ引数を取る
+void __attribute__((noreturn)) error(char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  fprintf(stderr, "\n");
+  exit(1);
+}
+
+// エラー箇所を報告するための関数
+void __attribute__((noreturn)) error_at(char *loc, char *msg) {
+  int pos = loc - user_input;
+  fprintf(stderr, "%s\n", user_input);
+  fprintf(stderr, "%*s", pos, ""); // pos個の空白を出力
+  fprintf(stderr, "^ %s\n", msg);
+  exit(1);
+}
 
 void tokenize() {
   char *p = user_input;
@@ -42,8 +62,7 @@ void tokenize() {
       continue;
     }
 
-    fprintf(stderr, "トークナイズできません\n");
-    exit(1);
+    error_at(p, "トークナイズできません");
   }
 
   tokens[i].ty = TK_EOF;
@@ -53,7 +72,7 @@ void tokenize() {
 
 int main(int argc, char **argv) {
   if (argc != 2) {
-    fprintf(stderr, "引数の個数が正しくありません\n");
+    error("引数の個数が正しくありません");
     return 1;
   }
 
@@ -66,18 +85,15 @@ int main(int argc, char **argv) {
   printf("main:\n");
 
   if (tokens[0].ty != TK_NUM)
-    fprintf(stderr, "数ではありません\n");
+    error_at(tokens[0].input, "数ではありません");
   printf("  mov rax, %d\n", tokens[0].val);
 
   int i = 1;
   while(tokens[i].ty != TK_EOF) {
     if(tokens[i].ty == '+') {
       i++;
-      if (tokens[i].ty != TK_NUM) {
-        fprintf(stderr, "%c 数ではありません\n", *tokens[i].input);
-        exit(1);
-      }
-
+      if (tokens[i].ty != TK_NUM)
+        error_at(tokens[i].input, "数ではありません");
       printf("  add rax, %d\n", tokens[i].val);
       i++;
       continue;
@@ -85,17 +101,14 @@ int main(int argc, char **argv) {
 
     if(tokens[i].ty == '-') {
       i++;
-      if (tokens[i].ty != TK_NUM) {
-        fprintf(stderr, "%c 数ではありません\n", *tokens[i].input);
-        exit(1);
-      }
+      if (tokens[i].ty != TK_NUM)
+        error_at(tokens[i].input, "数ではありません");
       printf("  sub rax, %d\n", tokens[i].val);
       i++;
       continue;
     }
 
-    fprintf(stderr, "予期しない文字です: '%c'\n", *tokens[i].input);
-    exit(1);
+    error_at(tokens[i].input, "予期しないトークンです");
   }
 
   printf("  ret\n");

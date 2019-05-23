@@ -8,6 +8,7 @@ enum {
   TK_NUM = 256,
   TK_EQ,
   TK_NE,
+  TK_LE,
   TK_EOF,
 };
 
@@ -58,6 +59,13 @@ void tokenize() {
     }
     if (strncmp(p, "!=", 2) == 0) {
       tokens[i].ty = TK_NE;
+      tokens[i].input = p;
+      i++;
+      p += 2;
+      continue;
+    }
+    if (strncmp(p, "<=", 2) == 0) {
+      tokens[i].ty = TK_LE;
       tokens[i].input = p;
       i++;
       p += 2;
@@ -123,6 +131,7 @@ int consume(int ty) {
   return 1;
 }
 Node *equality();
+Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
@@ -134,17 +143,26 @@ Node *expr() {
 }
 
 Node *equality() {
-  Node *node = add();
+  Node *node = relational();
   for (;;) {
     if (consume(TK_EQ))
-      node = new_node(TK_EQ, node, add());
+      node = new_node(TK_EQ, node, relational());
     else if (consume(TK_NE))
-      node = new_node(TK_NE, node, add());
+      node = new_node(TK_NE, node, relational());
     else
       return node;
   }
 }
 
+Node *relational() {
+  Node *node = add();
+  for (;;) {
+    if (consume(TK_LE))
+      node = new_node(TK_LE, node, add());
+    else
+      return node;
+  }
+}
 Node *add() {
   Node *node = mul(); 
 
@@ -231,6 +249,11 @@ void gen(Node *node) {
   case TK_NE:
     printf("  cmp rax, rdi\n");
     printf("  setne al\n");
+    printf("  movzb rax, al\n");
+    break;
+  case TK_LE:
+    printf("  cmp rax, rdi\n");
+    printf("  setle al\n");
     printf("  movzb rax, al\n");
     break;
   }

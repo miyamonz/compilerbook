@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdnoreturn.h>
 
+void runtest();
 noreturn void error(char *fmt, ...);
 noreturn void error_at(char *loc, char *msg);
 // token

@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum {
   TK_NUM = 256,
@@ -46,7 +47,7 @@ void tokenize() {
       continue;
     }
 
-    if (*p == '+' || *p == '-' || *p == '*' || *p == '/') {
+    if (strchr("+-*/", *p)) {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;

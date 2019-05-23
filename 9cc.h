@@ -11,6 +11,7 @@ noreturn void error_at(char *loc, char *msg);
 // token
 enum {
   TK_NUM = 256,
+  TK_IDENT,
   TK_EQ,
   TK_NE,
   TK_LE,
@@ -32,6 +33,7 @@ void tokenize();
 //node
 enum {
   ND_NUM = 256,
+  ND_IDENT,
 };
 
 typedef struct Node {
@@ -39,19 +41,20 @@ typedef struct Node {
   struct Node *lhs;
   struct Node *rhs;
   int val;
+  char name; // only use when ty is ND_IDENT
 } Node;
 
 Node *code[100];
 void program();
 Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
 Node *term();
-Node *num();
 
 void gen(Node *node);
 

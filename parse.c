@@ -36,8 +36,17 @@ Node *stmt() {
     error_at(tokens[pos].input, "';'ではないトークンです");
   return node;
 }
+
 Node *expr() {
-  return equality();
+  return assign();
+}
+
+Node *assign() {
+  Node *node = equality();
+  if(consume('='))
+    return new_node('=', node, assign());
+  return node;
+
 }
 
 Node *equality() {
@@ -109,11 +118,14 @@ Node *term() {
     return node;
   }
 
-  return num();
-}
-
-Node *num() {
   if (tokens[pos].ty == TK_NUM)
     return new_node_num(tokens[pos++].val);
-  error_at(tokens[pos].input, "数値でないトークンです");
+
+  if (tokens[pos].ty == TK_IDENT) {
+    Node *node = malloc(sizeof(Node));
+    node->ty = ND_IDENT;
+    node->name = *tokens[pos++].input;
+    return node;
+  }
+  error_at(tokens[pos].input, "数値でも識別子でもないトークンです");
 }

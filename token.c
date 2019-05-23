@@ -39,7 +39,15 @@ void tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<>;", *p)) {
+    if ('a' <= *p && *p <= 'z') {
+      tokens[i].ty = TK_IDENT;
+      tokens[i].input = p;
+      i++;
+      p++;
+      continue;
+    }
+
+    if (strchr("+-*/()<>;=", *p)) {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;

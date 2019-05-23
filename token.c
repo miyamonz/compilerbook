@@ -39,7 +39,7 @@ void tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<>", *p)) {
+    if (strchr("+-*/()<>;", *p)) {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;

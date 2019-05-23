@@ -41,6 +41,9 @@ typedef struct Node {
   int val;
 } Node;
 
+Node *code[100];
+void program();
+Node *stmt();
 Node *expr();
 Node *equality();
 Node *relational();

@@ -24,6 +24,18 @@ int consume(int ty) {
   return 1;
 }
 
+void program() {
+  int i = 0;
+  while (tokens[pos].ty != TK_EOF)
+    code[i++] = stmt();
+  code[i] = NULL;
+}
+Node *stmt() {
+  Node *node = expr();
+  if (!consume(';'))
+    error_at(tokens[pos].input, "';'ではないトークンです");
+  return node;
+}
 Node *expr() {
   return equality();
 }

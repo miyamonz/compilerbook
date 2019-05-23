@@ -12,16 +12,21 @@ int main(int argc, char **argv) {
 
   user_input = argv[1];
   tokenize();
-  Node *node = expr();
-
+  program();
 
   printf(".intel_syntax noprefix\n");
   printf(".global main\n");
   printf("main:\n");
 
-  gen(node);
+   // 先頭の式から順にコード生成
+  for (int i = 0; code[i]; i++) {
+    gen(code[i]);
 
-  printf("  pop rax\n");
+    // 式の評価結果としてスタックに一つの値が残っている
+    // はずなので、スタックが溢れないようにポップしておく
+    printf("  pop rax\n");
+  }
+
   printf("  ret\n");
   return 0;
 }

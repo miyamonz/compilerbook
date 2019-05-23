@@ -6,6 +6,7 @@
 
 enum {
   TK_NUM = 256,
+  TK_EQ,
   TK_EOF,
 };
 
@@ -44,6 +45,14 @@ void tokenize() {
     // 空白文字をスキップ
     if (isspace(*p)) {
       p++;
+      continue;
+    }
+
+    if (strncmp(p, "==", 2) == 0) {
+      tokens[i].ty = TK_EQ;
+      tokens[i].input = p;
+      i++;
+      p += 2;
       continue;
     }
 
@@ -105,12 +114,28 @@ int consume(int ty) {
   pos++;
   return 1;
 }
+Node *equality();
+Node *add();
 Node *mul();
 Node *unary();
 Node *term();
 Node *num();
 
 Node *expr() {
+  return equality();
+}
+
+Node *equality() {
+  Node *node = add();
+  for (;;) {
+    if (consume(TK_EQ))
+      node = new_node(TK_EQ, node, add());
+    else
+      return node;
+  }
+}
+
+Node *add() {
   Node *node = mul(); 
 
   for (;;) {
@@ -187,6 +212,11 @@ void gen(Node *node) {
   case '/':
     printf("  cqo\n");
     printf("  idiv rdi\n");
+    break;
+  case TK_EQ:
+    printf("  cmp rax, rdi\n");
+    printf("  sete al\n");
+    printf("  movzb rax, al\n");
     break;
   }
 

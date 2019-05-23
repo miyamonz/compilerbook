@@ -10,6 +10,14 @@ void tokenize() {
       continue;
     }
 
+    if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
+      tokens[i].ty = TK_RETURN;
+      tokens[i].input = p;
+      i++;
+      p += 6;
+      continue;
+    }
+
     if (strncmp(p, "==", 2) == 0) {
       tokens[i].ty = TK_EQ;
       tokens[i].input = p;

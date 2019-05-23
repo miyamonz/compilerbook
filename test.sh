@@ -58,4 +58,7 @@ try 1 ' 10; 10002 > 1001;'
 try 100 '3; a = 100;'
 try 103 ' a = 3; a + 100;'
 try 35 ' a = 3;b=5;  b + 10 * a ;'
+
+try 5 ' a = 3;b=5; return b;  b + 10 * a ;'
+try 3 ' return 3; a = 3;b=5; return b;  b + 10 * a ;'
 echo OK

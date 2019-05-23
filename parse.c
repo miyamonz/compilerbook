@@ -31,7 +31,15 @@ void program() {
   code[i] = NULL;
 }
 Node *stmt() {
-  Node *node = expr();
+  Node *node;
+  if (consume(TK_RETURN)) {
+    node = malloc(sizeof(Node));
+    node->ty = ND_RETURN;
+    node->lhs = expr();
+  } else {
+    node = expr();
+  }
+
   if (!consume(';'))
     error_at(tokens[pos].input, "';'ではないトークンです");
   return node;

@@ -8,10 +8,12 @@
 void runtest();
 noreturn void error(char *fmt, ...);
 noreturn void error_at(char *loc, char *msg);
+int is_alnum(char c);
 // token
 enum {
   TK_NUM = 256,
   TK_IDENT,
+  TK_RETURN,
   TK_EQ,
   TK_NE,
   TK_LE,
@@ -34,6 +36,7 @@ void tokenize();
 enum {
   ND_NUM = 256,
   ND_IDENT,
+  ND_RETURN,
 };
 
 typedef struct Node {

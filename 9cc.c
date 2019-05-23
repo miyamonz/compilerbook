@@ -80,7 +80,7 @@ void tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<", *p)) {
+    if (strchr("+-*/()<>", *p)) {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;
@@ -171,6 +171,8 @@ Node *relational() {
       node = new_node(TK_LE, add(), node);
     else if (consume('<'))
       node = new_node('<', node, add());
+    else if (consume('>'))
+      node = new_node('<', add(), node);
     else
       return node;
   }

@@ -1,20 +1,16 @@
 #include "9cc.h"
 
+Map *keywords;
 void tokenize() {
   char *p = user_input;
   int i = 0;
+  keywords = new_map();
+  map_put(keywords, "return", (void *) TK_RETURN);
+
   while (*p) {
     // 空白文字をスキップ
     if (isspace(*p)) {
       p++;
-      continue;
-    }
-
-    if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
-      tokens[i].ty = TK_RETURN;
-      tokens[i].input = p;
-      i++;
-      p += 6;
       continue;
     }
 
@@ -52,7 +48,10 @@ void tokenize() {
       while(is_alnum(p[len]))
         len++;
       char *name = strndup(p, (size_t)len);
-      tokens[i].ty = TK_IDENT;
+      int ty = (intptr_t) map_get(keywords, name);
+      if(!ty)
+        ty = TK_IDENT;
+      tokens[i].ty = ty;
       tokens[i].input = p;
       tokens[i].name = name;
       i++;

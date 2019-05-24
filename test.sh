@@ -66,4 +66,7 @@ try 199 'one=1; two = 2; return 100 * two - one;'
 
 try 100 'if(1) return 100; 2;'
 try 101 'if(1 == 3) return 100; if(100) return 101; return 1;'
+
+try 2 'if(1) return 2; else return 3; return 4;'
+try 3 'if(0) return 2; else return 3; return 4;'
 echo OK

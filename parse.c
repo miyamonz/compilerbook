@@ -32,18 +32,25 @@ void program() {
 }
 Node *stmt() {
   Node *node;
-  if (consume(TK_RETURN)) {
-    node = malloc(sizeof(Node));
-    node->ty = ND_RETURN;
-    node->lhs = expr();
-  } else if(consume(TK_IF) && consume('(')) {
+
+  if(consume(TK_IF)) {
+    if(!consume('('))
+      error_at(tokens[pos].input, "ifにカッコがありません\n");
     node = malloc(sizeof(Node));
     node->ty = ND_IF;
     node->cond = expr();
     if(!consume(')'))
       error_at(tokens[pos].input, "if(...に対応する閉じカッコがありません\n");
     node->then = stmt();
+    if(consume(TK_ELSE))
+       node->els = stmt();
     return node;
+  }
+
+  if (consume(TK_RETURN)) {
+    node = malloc(sizeof(Node));
+    node->ty = ND_RETURN;
+    node->lhs = expr();
   } else {
     node = expr();
   }

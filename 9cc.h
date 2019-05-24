@@ -18,6 +18,7 @@ enum {
   TK_IDENT,
   TK_RETURN,
   TK_IF,
+  TK_ELSE,
   TK_EQ,
   TK_NE,
   TK_LE,
@@ -55,6 +56,7 @@ typedef struct Node {
   //if
   struct Node *cond;
   struct Node *then;
+  struct Node *els;
 
 } Node;
 

@@ -1,10 +1,15 @@
 #include "9cc.h"
+#include <stdint.h>
 
 void gen_lval(Node *node) {
   if (node->ty != ND_IDENT)
     error("代入の左辺値が変数ではありません");
 
-  int offset = ('z' - node->name + 1) * 8;
+  if(!map_get(vars, node->name)) {
+    bpoff += 8;
+    map_put(vars, node->name, (void *)(intptr_t)bpoff);
+  }
+  int offset = (int)(intptr_t)map_get(vars,node->name);
   printf("  mov rax, rbp\n");
   printf("  sub rax, %d\n", offset);
   printf("  push rax\n");

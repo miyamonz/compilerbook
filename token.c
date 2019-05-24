@@ -47,13 +47,19 @@ void tokenize() {
       continue;
     }
 
-    if ('a' <= *p && *p <= 'z') {
+    if(is_alpha(*p) || (*p == '_')) {
+      int len = 1;
+      while(is_alnum(p[len]))
+        len++;
+      char *name = strndup(p, (size_t)len);
       tokens[i].ty = TK_IDENT;
       tokens[i].input = p;
+      tokens[i].name = name;
       i++;
-      p++;
+      p += len;
       continue;
     }
+
 
     if (strchr("+-*/()<>;=", *p)) {
       tokens[i].ty = *p;

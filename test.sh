@@ -61,4 +61,6 @@ try 35 ' a = 3;b=5;  b + 10 * a ;'
 
 try 5 ' a = 3;b=5; return b;  b + 10 * a ;'
 try 3 ' return 3; a = 3;b=5; return b;  b + 10 * a ;'
+
+try 199 'one=1; two = 2; return 100 * two - one;'
 echo OK

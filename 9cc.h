@@ -8,6 +8,8 @@
 void runtest();
 noreturn void error(char *fmt, ...);
 noreturn void error_at(char *loc, char *msg);
+int is_alpha(char c);
+int is_digit(char c);
 int is_alnum(char c);
 // token
 enum {
@@ -24,6 +26,7 @@ enum {
 typedef struct {
   int ty;
   int val;
+  char *name; // ty == TK_IDENTのとき、変数名
   char *input;
 } Token;
 
@@ -44,7 +47,7 @@ typedef struct Node {
   struct Node *lhs;
   struct Node *rhs;
   int val;
-  char name; // only use when ty is ND_IDENT
+  char *name; // only use when ty is ND_IDENT
 } Node;
 
 Node *code[100];
@@ -78,3 +81,6 @@ typedef struct {
 Map *new_map();
 void map_put(Map *map, char *key, void *val);
 void *map_get(Map *map, char *key);
+
+Map *vars;
+int bpoff;

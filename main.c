@@ -14,6 +14,9 @@ int main(int argc, char **argv) {
   tokenize();
   program();
 
+  vars = new_map();
+  bpoff = 0;
+
   printf(".intel_syntax noprefix\n");
   printf(".global main\n");
   printf("main:\n");

@@ -132,7 +132,7 @@ Node *term() {
   if (tokens[pos].ty == TK_IDENT) {
     Node *node = malloc(sizeof(Node));
     node->ty = ND_IDENT;
-    node->name = *tokens[pos++].input;
+    node->name = tokens[pos++].name;
     return node;
   }
   error_at(tokens[pos].input, "数値でも識別子でもないトークンです");

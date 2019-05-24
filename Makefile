@@ -1,4 +1,4 @@
-CFLAGS=-Wall -std=c11
+CFLAGS=-Wall -std=c11 -D_GNU_SOURCE
 SRCS=$(wildcard *.c)
 OBJS=$(SRCS:.c=.o)
 

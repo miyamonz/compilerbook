@@ -35,6 +35,16 @@ void gen(Node *node) {
     printf("  ret\n");
     return;
   }
+  if (node->ty == ND_IF) {
+    gen(node->cond);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je .Lend%d\n", label);
+    gen(node->then);
+    printf(".Lend%d:\n", label);
+    label++;
+    return;
+  }
 
   if (node->ty == '=') {
     gen_lval(node->lhs);

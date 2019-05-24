@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
 
   vars = new_map();
   bpoff = 0;
+  label = 0;
 
   printf(".intel_syntax noprefix\n");
   printf(".global main\n");

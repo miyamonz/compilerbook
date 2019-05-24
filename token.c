@@ -6,6 +6,7 @@ void tokenize() {
   int i = 0;
   keywords = new_map();
   map_put(keywords, "return", (void *) TK_RETURN);
+  map_put(keywords, "if", (void *) TK_IF);
 
   while (*p) {
     // 空白文字をスキップ

@@ -63,4 +63,7 @@ try 5 ' a = 3;b=5; return b;  b + 10 * a ;'
 try 3 ' return 3; a = 3;b=5; return b;  b + 10 * a ;'
 
 try 199 'one=1; two = 2; return 100 * two - one;'
+
+try 100 'if(1) return 100; 2;'
+try 101 'if(1 == 3) return 100; if(100) return 101; return 1;'
 echo OK

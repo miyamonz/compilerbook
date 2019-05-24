@@ -17,6 +17,7 @@ enum {
   TK_NUM = 256,
   TK_IDENT,
   TK_RETURN,
+  TK_IF,
   TK_EQ,
   TK_NE,
   TK_LE,
@@ -41,6 +42,7 @@ enum {
   ND_NUM = 256,
   ND_IDENT,
   ND_RETURN,
+  ND_IF,
 };
 
 typedef struct Node {
@@ -49,6 +51,11 @@ typedef struct Node {
   struct Node *rhs;
   int val;
   char *name; // only use when ty is ND_IDENT
+
+  //if
+  struct Node *cond;
+  struct Node *then;
+
 } Node;
 
 Node *code[100];
@@ -64,6 +71,7 @@ Node *unary();
 Node *term();
 
 void gen(Node *node);
+int label;
 
 
 

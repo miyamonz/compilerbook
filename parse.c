@@ -36,6 +36,14 @@ Node *stmt() {
     node = malloc(sizeof(Node));
     node->ty = ND_RETURN;
     node->lhs = expr();
+  } else if(consume(TK_IF) && consume('(')) {
+    node = malloc(sizeof(Node));
+    node->ty = ND_IF;
+    node->cond = expr();
+    if(!consume(')'))
+      error_at(tokens[pos].input, "if(...に対応する閉じカッコがありません\n");
+    node->then = stmt();
+    return node;
   } else {
     node = expr();
   }

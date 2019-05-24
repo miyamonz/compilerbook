@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdnoreturn.h>
+#include <stdint.h>
 
 void runtest();
 noreturn void error(char *fmt, ...);

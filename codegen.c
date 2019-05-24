@@ -1,5 +1,4 @@
 #include "9cc.h"
-#include <stdint.h>
 
 void gen_lval(Node *node) {
   if (node->ty != ND_IDENT)

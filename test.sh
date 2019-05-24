@@ -69,4 +69,6 @@ try 101 'if(1 == 3) return 100; if(100) return 101; return 1;'
 
 try 2 'if(1) return 2; else return 3; return 4;'
 try 3 'if(0) return 2; else return 3; return 4;'
+
+try 55 'i=0; j=0; while(i<10) j = j + (i = i + 1); return j; '
 echo OK

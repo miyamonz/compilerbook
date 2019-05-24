@@ -47,6 +47,18 @@ Node *stmt() {
     return node;
   }
 
+  if(consume(TK_WHILE)) {
+    if(!consume('('))
+      error_at(tokens[pos].input, "whileにカッコがありません\n");
+    node = malloc(sizeof(Node));
+    node->ty = ND_WHILE;
+    node->cond = expr();
+    if(!consume(')'))
+      error_at(tokens[pos].input, "while(...に対応する閉じカッコがありません\n");
+    node->body = stmt();
+    return node;
+  }
+
   if (consume(TK_RETURN)) {
     node = malloc(sizeof(Node));
     node->ty = ND_RETURN;

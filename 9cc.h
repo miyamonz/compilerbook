@@ -21,10 +21,10 @@ enum {
   TK_ELSE,
   TK_WHILE,
   TK_FOR,
-  TK_EQ,
-  TK_NE,
-  TK_LE,
-  TK_GE,
+  TK_EQ, // ==
+  TK_NE, // !=
+  TK_LE, // <=
+  TK_GE, // >=
   TK_EOF,
 };
 
@@ -49,6 +49,9 @@ enum {
   ND_WHILE,
   ND_FOR,
   ND_BLOCK,
+  ND_EQ,
+  ND_NE,
+  ND_LE,
 };
 
 typedef struct Node {

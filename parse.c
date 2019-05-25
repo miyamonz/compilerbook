@@ -140,9 +140,9 @@ Node *equality() {
   Node *node = relational();
   for (;;) {
     if (consume(TK_EQ))
-      node = new_node(TK_EQ, node, relational());
+      node = new_node(ND_EQ, node, relational());
     else if (consume(TK_NE))
-      node = new_node(TK_NE, node, relational());
+      node = new_node(ND_NE, node, relational());
     else
       return node;
   }
@@ -152,9 +152,9 @@ Node *relational() {
   Node *node = add();
   for (;;) {
     if (consume(TK_LE))
-      node = new_node(TK_LE, node, add());
+      node = new_node(ND_LE, node, add());
     else if (consume(TK_GE))
-      node = new_node(TK_LE, add(), node);
+      node = new_node(ND_LE, add(), node);
     else if (consume('<'))
       node = new_node('<', node, add());
     else if (consume('>'))

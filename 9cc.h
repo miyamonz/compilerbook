@@ -6,6 +6,26 @@
 #include <stdnoreturn.h>
 #include <stdint.h>
 
+// util.c
+typedef struct {
+  void **data;
+  int capacity;
+  int len;
+} Vector;
+Vector *new_vector();
+void vec_push(Vector *vec, void *elem);
+
+typedef struct {
+  Vector *keys;
+  Vector *vals;
+} Map;
+Map *new_map();
+void map_put(Map *map, char *key, void *val);
+void *map_get(Map *map, char *key);
+
+Map *vars;
+int bpoff;
+
 void runtest();
 noreturn void error(char *fmt, ...);
 noreturn void error_at(char *loc, char *msg);
@@ -92,24 +112,3 @@ Node *term();
 
 void gen(Node *node);
 int label;
-
-
-
-typedef struct {
-  void **data;
-  int capacity;
-  int len;
-} Vector;
-Vector *new_vector();
-void vec_push(Vector *vec, void *elem);
-
-typedef struct {
-  Vector *keys;
-  Vector *vals;
-} Map;
-Map *new_map();
-void map_put(Map *map, char *key, void *val);
-void *map_get(Map *map, char *key);
-
-Map *vars;
-int bpoff;

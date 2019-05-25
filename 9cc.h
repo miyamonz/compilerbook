@@ -65,6 +65,7 @@ enum {
   ND_NUM = 256,
   ND_IDENT,
   ND_CALL,
+  ND_FUNC,
   ND_RETURN,
   ND_IF,
   ND_WHILE,
@@ -95,14 +96,16 @@ typedef struct Node {
   struct Node *inc;
 
   //block { stmt* }
-  struct Node *stmts[100];
+  struct Node *stmts[200];
 
   // function call
   Vector *args;
 } Node;
 
-Node *code[100];
+Node *funcs[100];
 void program();
+Node *function();
+Node *compound_stmt();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -114,4 +117,5 @@ Node *unary();
 Node *term();
 
 void gen(Node *node);
+void gen_func(Node *node);
 int label;

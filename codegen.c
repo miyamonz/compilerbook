@@ -186,3 +186,28 @@ void gen(Node *node) {
 
   printf("  push rax\n");
 }
+
+void gen_func(Node *node) {
+  if (node->ty != ND_FUNC)
+    error("関数ではありません");
+
+  printf("%s:\n", node->name);
+
+  //プロローグ
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
+  int i=0;
+  while(node->body->stmts[i]) {
+    gen(node->body->stmts[i]);
+    i++;
+    // 式の評価結果がスタックに一つの値が残っている
+    // 溢れないようにポップしておく
+    printf("  pop rax\n");
+  }
+  // エピローグ
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
+
+  printf("  ret\n");
+}

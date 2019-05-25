@@ -26,16 +26,44 @@ int consume(int ty) {
 static void expect(int ty) {
   if(consume(ty)) return;
 
-  char *e = "";
-  sprintf(e, "%c expected.", (char)ty);
-  error_at(tokens[pos].input, e);
+  char msg[100] = "\0";
+  sprintf(msg, "%c expected", (char)ty);
+  error_at(tokens[pos].input, msg);
 }
 
 void program() {
   int i = 0;
-  while (tokens[pos].ty != TK_EOF)
-    code[i++] = stmt();
-  code[i] = NULL;
+  while(tokens[pos].ty != TK_EOF)
+    funcs[i++] = function();
+  funcs[i] = NULL;
+}
+
+Node *function() {
+  Node *node = malloc(sizeof(Node));
+  node->ty = ND_FUNC;
+  node->args = new_vector();
+
+  if (tokens[pos].ty != TK_IDENT) {
+    error_at(tokens[pos].input, "function name expected");
+  }
+  node->name = tokens[pos++].name;
+
+  expect('(');
+  expect(')');
+  expect('{');
+  node->body = compound_stmt();
+
+  return node;
+}
+
+Node *compound_stmt() {
+  Node *node = malloc(sizeof(Node));
+  node->ty = ND_BLOCK;
+  int i = 0;
+  while (! consume('}')) {
+    node->stmts[i++] = stmt();
+  }
+  return node;
 }
 Node *stmt() {
   Node *node;

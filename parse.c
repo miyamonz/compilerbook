@@ -100,6 +100,17 @@ Node *stmt() {
     return node;
   }
 
+  if (consume('{')) {
+    node = malloc(sizeof(Node));
+    node->ty = ND_BLOCK;
+
+    int i=0;
+    while(! consume('}'))
+      node->stmts[i++] = stmt();
+
+    return node;
+  }
+
   if (consume(TK_RETURN)) {
     node = malloc(sizeof(Node));
     node->ty = ND_RETURN;

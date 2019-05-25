@@ -86,6 +86,17 @@ void gen(Node *node) {
     return;
   }
 
+  if (node->ty == ND_BLOCK) {
+
+    int len = sizeof(node->stmts) / sizeof(node->stmts[0]);
+    for(int i=0; i<len; i++) {
+      if(!node->stmts[i]) break;
+      gen(node->stmts[i]);
+      printf("  pop rax\n");
+    }
+    return;
+  }
+
   if (node->ty == '=') {
     gen_lval(node->lhs);
     gen(node->rhs);

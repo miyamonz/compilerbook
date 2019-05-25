@@ -74,4 +74,7 @@ try 55 'i=0; j=0; while(i<10) j = j + (i = i + 1); return j; '
 
 try 45 'j=0; for(i=0; i<10; i = i+1) j = j + i; return j;'
 try 45 'j=0; i=0; for(; i<10; i = i+1) j = j + i; return j;'
+
+try 55 'i=0; j=0; while(i<10) { i=i+1;  j = j + i; } return j; '
+try 200 'i = 0; if( i == 0 ){ i = 100; i = i * 2;  } return i;'
 echo OK

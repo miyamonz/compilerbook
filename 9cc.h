@@ -48,6 +48,7 @@ enum {
   ND_IF,
   ND_WHILE,
   ND_FOR,
+  ND_BLOCK,
 };
 
 typedef struct Node {
@@ -68,6 +69,9 @@ typedef struct Node {
   //for(init; cond; inc) body;
   struct Node *init;
   struct Node *inc;
+
+  //block { stmt* }
+  struct Node *stmts[100];
 } Node;
 
 Node *code[100];

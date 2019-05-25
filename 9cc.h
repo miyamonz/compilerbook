@@ -20,6 +20,7 @@ enum {
   TK_IF,
   TK_ELSE,
   TK_WHILE,
+  TK_FOR,
   TK_EQ,
   TK_NE,
   TK_LE,
@@ -46,6 +47,7 @@ enum {
   ND_RETURN,
   ND_IF,
   ND_WHILE,
+  ND_FOR,
 };
 
 typedef struct Node {
@@ -62,6 +64,10 @@ typedef struct Node {
 
   // while (cond) body;
   struct Node *body;
+
+  //for(init; cond; inc) body;
+  struct Node *init;
+  struct Node *inc;
 } Node;
 
 Node *code[100];

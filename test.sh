@@ -71,4 +71,7 @@ try 2 'if(1) return 2; else return 3; return 4;'
 try 3 'if(0) return 2; else return 3; return 4;'
 
 try 55 'i=0; j=0; while(i<10) j = j + (i = i + 1); return j; '
+
+try 45 'j=0; for(i=0; i<10; i = i+1) j = j + i; return j;'
+try 45 'j=0; i=0; for(; i<10; i = i+1) j = j + i; return j;'
 echo OK

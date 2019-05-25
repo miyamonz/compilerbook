@@ -9,6 +9,7 @@ void tokenize() {
   map_put(keywords, "if", (void *) TK_IF);
   map_put(keywords, "else", (void *) TK_ELSE);
   map_put(keywords, "while", (void *) TK_WHILE);
+  map_put(keywords, "for", (void *) TK_FOR);
 
   while (*p) {
     // 空白文字をスキップ

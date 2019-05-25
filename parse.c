@@ -59,6 +59,47 @@ Node *stmt() {
     return node;
   }
 
+  if(consume(TK_FOR)) {
+    node = malloc(sizeof(Node));
+    node->ty = ND_FOR;
+
+    if(!consume('('))
+      error_at(tokens[pos].input, "forにカッコがありません\n");
+
+    // init
+    if( tokens[pos].ty == ';' ) {
+      node->init = NULL;
+      consume(';');
+    } else {
+      node->init = expr();
+      if(!consume(';'))
+        error_at(tokens[pos].input, ";がありません\n");
+    }
+
+    // cond
+    if( tokens[pos].ty == ';' ) {
+      node->cond = NULL;
+      consume(';');
+    } else {
+      node->cond = expr();
+      if(!consume(';'))
+        error_at(tokens[pos].input, ";がありません\n");
+    }
+
+    // inc
+    if( tokens[pos].ty == ')' ) {
+      node->inc = NULL;
+      consume(')');
+    } else {
+      node->inc = expr();
+      if(!consume(')'))
+        error_at(tokens[pos].input, ")がありません\n");
+    }
+
+    node->body = stmt();
+    return node;
+  }
+
   if (consume(TK_RETURN)) {
     node = malloc(sizeof(Node));
     node->ty = ND_RETURN;

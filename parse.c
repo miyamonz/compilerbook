@@ -210,14 +210,26 @@ Node *term() {
 
   if (tokens[pos].ty == TK_IDENT) {
     Node *node = malloc(sizeof(Node));
-    node->ty = ND_IDENT;
     node->name = tokens[pos++].name;
-    // function call
-    if(consume('(')) {
-      if(!consume(')'))
-        error_at(tokens[pos].input, "関数呼び出しの閉じカッコがありません");
-      node->ty = ND_CALL;
+
+    // identifier
+    if(!consume('(')) {
+      node->ty = ND_IDENT;
+      return node;
     }
+
+    // function call
+    node->ty = ND_CALL;
+    node->args = new_vector();
+    if(consume(')'))
+      return node;
+
+    vec_push(node->args, (void *)expr());
+    while(consume(','))
+      vec_push(node->args, (void *)expr());
+
+    if(!consume(')'))
+      error_at(tokens[pos].input, "関数呼び出しの閉じカッコがありません");
     return node;
   }
   error_at(tokens[pos].input, "数値でも識別子でもないトークンです");

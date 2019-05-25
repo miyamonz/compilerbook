@@ -29,8 +29,35 @@ void gen(Node *node) {
   }
 
   if (node->ty == ND_CALL) {
+    printf("  push rbx\n");
+    printf("  push rbp\n");
+    printf("  push rsp\n");
+    printf("  push r12\n");
+    printf("  push r13\n");
+    printf("  push r14\n");
+    printf("  push r15\n");
+
+    char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+    int len = 6;
+    for (int i = 0; i < len; i++) {
+      Node *expr = (Node *)node->args->data[i];
+      if(!expr) break;
+      gen(expr);
+      printf("  pop %s\n", arg[i]);
+    }
+    printf("  mov rax, 0\n");
     printf("  call %s\n", node->name);
-    printf("  push rax\n");
+    printf("  mov r10, rax\n");
+
+    printf("  pop r15\n");
+    printf("  pop r14\n");
+    printf("  pop r13\n");
+    printf("  pop r12\n");
+    printf("  pop rsp\n");
+    printf("  pop rbp\n");
+    printf("  pop rbx\n");
+
+    printf("  push r10\n");
     return;
   }
 

@@ -96,6 +96,9 @@ typedef struct Node {
 
   //block { stmt* }
   struct Node *stmts[100];
+
+  // function call
+  Vector *args;
 } Node;
 
 Node *code[100];

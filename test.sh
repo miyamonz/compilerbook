@@ -17,6 +17,7 @@ try() {
 }
 echo 'int foo() { printf("OK from foo\n"); }' | gcc -xc -c -o tmp-foo.o -
 echo 'int two() { return 2; }' | gcc -xc -c -o tmp-two.o -
+echo 'int plus(int x, int y) { return x + y; }' | gcc -xc -c -o tmp-plus.o -
 
 try 0 '0;'
 try 42 '42;'
@@ -83,4 +84,8 @@ try 200 'i = 0; if( i == 0 ){ i = 100; i = i * 2;  } return i;'
 try 100 'foo(); return 100;'
 try 100 'for(i=0; i<5; i=i+1) {foo();} return 100;'
 try 9 '1 + two() * 4;'
+
+try 3 'plus(1,2);'
+try 4 '1 + plus(1,2);'
+try 50 '2 + plus(2,10) * 4;'
 echo OK

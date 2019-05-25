@@ -44,6 +44,7 @@ void tokenize();
 enum {
   ND_NUM = 256,
   ND_IDENT,
+  ND_CALL,
   ND_RETURN,
   ND_IF,
   ND_WHILE,

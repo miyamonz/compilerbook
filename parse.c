@@ -212,6 +212,12 @@ Node *term() {
     Node *node = malloc(sizeof(Node));
     node->ty = ND_IDENT;
     node->name = tokens[pos++].name;
+    // function call
+    if(consume('(')) {
+      if(!consume(')'))
+        error_at(tokens[pos].input, "関数呼び出しの閉じカッコがありません");
+      node->ty = ND_CALL;
+    }
     return node;
   }
   error_at(tokens[pos].input, "数値でも識別子でもないトークンです");

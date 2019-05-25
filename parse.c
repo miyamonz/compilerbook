@@ -23,6 +23,13 @@ int consume(int ty) {
   pos++;
   return 1;
 }
+static void expect(int ty) {
+  if(consume(ty)) return;
+
+  char *e = "";
+  sprintf(e, "%c expected.", (char)ty);
+  error_at(tokens[pos].input, e);
+}
 
 void program() {
   int i = 0;
@@ -34,13 +41,11 @@ Node *stmt() {
   Node *node;
 
   if(consume(TK_IF)) {
-    if(!consume('('))
-      error_at(tokens[pos].input, "ifにカッコがありません\n");
+    expect('(');
     node = malloc(sizeof(Node));
     node->ty = ND_IF;
     node->cond = expr();
-    if(!consume(')'))
-      error_at(tokens[pos].input, "if(...に対応する閉じカッコがありません\n");
+    expect(')');
     node->then = stmt();
     if(consume(TK_ELSE))
        node->els = stmt();
@@ -48,13 +53,11 @@ Node *stmt() {
   }
 
   if(consume(TK_WHILE)) {
-    if(!consume('('))
-      error_at(tokens[pos].input, "whileにカッコがありません\n");
+    expect('(');
     node = malloc(sizeof(Node));
     node->ty = ND_WHILE;
     node->cond = expr();
-    if(!consume(')'))
-      error_at(tokens[pos].input, "while(...に対応する閉じカッコがありません\n");
+    expect(')');
     node->body = stmt();
     return node;
   }
@@ -63,8 +66,7 @@ Node *stmt() {
     node = malloc(sizeof(Node));
     node->ty = ND_FOR;
 
-    if(!consume('('))
-      error_at(tokens[pos].input, "forにカッコがありません\n");
+    expect('(');
 
     // init
     if( tokens[pos].ty == ';' ) {
@@ -72,8 +74,7 @@ Node *stmt() {
       consume(';');
     } else {
       node->init = expr();
-      if(!consume(';'))
-        error_at(tokens[pos].input, ";がありません\n");
+      expect(';');
     }
 
     // cond
@@ -82,8 +83,7 @@ Node *stmt() {
       consume(';');
     } else {
       node->cond = expr();
-      if(!consume(';'))
-        error_at(tokens[pos].input, ";がありません\n");
+      expect(';');
     }
 
     // inc
@@ -92,8 +92,7 @@ Node *stmt() {
       consume(')');
     } else {
       node->inc = expr();
-      if(!consume(')'))
-        error_at(tokens[pos].input, ")がありません\n");
+      expect(')');
     }
 
     node->body = stmt();
@@ -119,8 +118,8 @@ Node *stmt() {
     node = expr();
   }
 
-  if (!consume(';'))
-    error_at(tokens[pos].input, "';'ではないトークンです");
+  expect(';');
+
   return node;
 }
 
@@ -199,9 +198,7 @@ Node *unary() {
 Node *term() {
   if(consume('(')) {
     Node *node = expr();
-
-    if(!consume(')'))
-      error_at(tokens[pos].input, "対応する閉じカッコがありません");
+    expect(')');
     return node;
   }
 
@@ -227,10 +224,9 @@ Node *term() {
     vec_push(node->args, (void *)expr());
     while(consume(','))
       vec_push(node->args, (void *)expr());
-
-    if(!consume(')'))
-      error_at(tokens[pos].input, "関数呼び出しの閉じカッコがありません");
+    expect(')');
     return node;
   }
+
   error_at(tokens[pos].input, "数値でも識別子でもないトークンです");
 }

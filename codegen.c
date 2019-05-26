@@ -1,5 +1,8 @@
 #include "9cc.h"
 
+char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+int len = sizeof(arg)/sizeof(*arg);
+
 void gen_lval(Node *node) {
   if (node->ty != ND_IDENT)
     error("代入の左辺値が変数ではありません");
@@ -37,8 +40,6 @@ void gen(Node *node) {
     printf("  push r14\n");
     printf("  push r15\n");
 
-    char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
-    int len = 6;
     for (int i = 0; i < len; i++) {
       Node *expr = (Node *)node->args->data[i];
       if(!expr) break;

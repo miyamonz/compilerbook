@@ -198,6 +198,16 @@ void gen_func(Node *node) {
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, 208\n");
+
+  // 変数代入と同様のコードを作り、値はABIに基づいて代入する
+  for(int i=0; i<len; i++) {
+    Node *expr = (Node *)node->args->data[i];
+    if(!expr) break;
+    gen_lval(expr);
+    printf("  pop rax\n");
+    printf("  mov [rax], %s\n", arg[i]);
+  }
+
   int i=0;
   while(node->body->stmts[i]) {
     gen(node->body->stmts[i]);

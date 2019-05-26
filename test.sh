@@ -90,4 +90,8 @@ try 4 'main() { return 1 + plus(1,2); }'
 try 50 'main() { return 2 + plus(2,10) * 4; }'
 
 try 5 'two() { return 2; } main() { return 2 *two() + 1; }'
+try 5 'add3(x) { return x+3; } main() { return add3(2); }'
+try 5 'add(x, y) { return x+y; } main() { return add(2, 3); }'
+try 13 'fib(i) { if(i<=1) return 1; return fib(i-1) + fib(i-2); } main() { return fib(6); }'
+
 echo OK

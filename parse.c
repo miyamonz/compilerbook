@@ -49,7 +49,12 @@ Node *function() {
   node->name = tokens[pos++].name;
 
   expect('(');
-  expect(')');
+  if(! consume(')')) {
+    vec_push(node->args, (void *)expr());
+    while(consume(','))
+      vec_push(node->args, (void *)expr());
+    expect(')');
+  }
   expect('{');
   node->body = compound_stmt();
 

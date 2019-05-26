@@ -58,14 +58,14 @@ try 1 'main() { return 10002 > 1001; }'
 
 try 1 'main() { 10; return 10002 > 1001; }'
 
-try 100 'main() {3; return a = 100; }'
-try 103 'main() { a = 3; return a + 100; }'
-try 35 'main() { a = 3;b=5; return b + 10 * a ; }'
+try 100 'main() { 3; int a; return a = 100; }'
+try 103 'main() { int a; a = 3; return a + 100; }'
+try 35 'main() { int a;int b; a = 3;b=5; return b + 10 * a ; }'
 
-try 5 'main() {  a = 3;b=5; return b;  b + 10 * a ; }'
-try 3 'main() {  return 3; a = 3;b=5; return b;  b + 10 * a ; }'
+try 5 'main() { int a;int b; a = 3;b=5; return b;  b + 10 * a ; }'
+try 3 'main() { int a; int b; return 3; a = 3;b=5; return b;  b + 10 * a ; }'
 
-try 199 'main() {one=1; two = 2; return 100 * two - one; }'
+try 199 'main() { int one; int two; one=1; two = 2; return 100 * two - one; }'
 
 try 100 'main() {if(1) return 100; 2; }'
 try 101 'main() {if(1 == 3) return 100; if(100) return 101; return 1; }'

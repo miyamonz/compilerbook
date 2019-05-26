@@ -36,6 +36,7 @@ int is_alnum(char c);
 enum {
   TK_NUM = 256,
   TK_IDENT,
+  TK_INT,
   TK_RETURN,
   TK_IF,
   TK_ELSE,
@@ -64,6 +65,7 @@ void tokenize();
 enum {
   ND_NUM = 256,
   ND_IDENT,
+  ND_VARDEF,
   ND_CALL,
   ND_FUNC,
   ND_RETURN,

@@ -73,6 +73,18 @@ Node *compound_stmt() {
 Node *stmt() {
   Node *node;
 
+  if(consume(TK_INT)) {
+    if( tokens[pos].ty != TK_IDENT )
+      error_at(tokens[pos].input, "int の後には変数名が必要です");
+
+    node = malloc(sizeof(Node));
+    node->ty = ND_VARDEF;
+    node->name = tokens[pos++].name;
+
+    expect(';');
+    return node;
+  }
+
   if(consume(TK_IF)) {
     expect('(');
     node = malloc(sizeof(Node));

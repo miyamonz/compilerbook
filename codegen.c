@@ -3,14 +3,14 @@
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
 
+//lval returns pointer to variable
 void gen_lval(Node *node) {
   if (node->ty != ND_IDENT)
     error("代入の左辺値が変数ではありません");
 
-  if(!map_get(vars, node->name)) {
-    bpoff += 8;
-    map_put(vars, node->name, (void *)(intptr_t)bpoff);
-  }
+  if(!map_get(vars, node->name))
+    error("variable %s is not defined yet.", node->name);
+
   int offset = (int)(intptr_t)map_get(vars,node->name);
   printf("  mov rax, rbp\n");
   printf("  sub rax, %d\n", offset);
@@ -28,6 +28,15 @@ void gen(Node *node) {
     printf("  pop rax\n");
     printf("  mov rax, [rax]\n");
     printf("  push rax\n");
+    return;
+  }
+
+  if (node->ty == ND_VARDEF) {
+    if(map_get(vars, node->name))
+      error("%s is already defined.", node->name);
+
+    bpoff += 8;
+    map_put(vars, node->name, (void *)(intptr_t)bpoff);
     return;
   }
 

@@ -3,6 +3,18 @@
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
 
+int gen_vardef(Node *node) {
+  if (node->op != ND_VARDEF)
+    error("変数宣言ではありません");
+
+  if(map_get(vars, node->name))
+    error("%s is already defined.", node->name);
+
+  bpoff += 8;
+  map_put(vars, node->name, (void *)(intptr_t)bpoff);
+  return bpoff;
+}
+
 //lval returns pointer to variable
 void gen_lval(Node *node) {
   if (node->op != ND_IDENT)
@@ -32,11 +44,7 @@ void gen(Node *node) {
   }
 
   if (node->op == ND_VARDEF) {
-    if(map_get(vars, node->name))
-      error("%s is already defined.", node->name);
-
-    bpoff += 8;
-    map_put(vars, node->name, (void *)(intptr_t)bpoff);
+    gen_vardef(node);
     return;
   }
 
@@ -210,13 +218,14 @@ void gen_func(Node *node) {
 
   // 変数代入と同様のコードを作り、値はABIに基づいて代入する
   for(int i=0; i<len; i++) {
-    Node *expr = (Node *)node->args->data[i];
-    if(!expr) break;
+    Node *param = (Node *)node->args->data[i];
+    if(!param) break;
 
-    bpoff += 8;
-    map_put(vars, expr->name, (void *)(intptr_t)bpoff);
+    int offset = gen_vardef(param);
+    printf("  mov rax, rbp\n");
+    printf("  sub rax, %d\n", offset);
+    printf("  push rax\n");
 
-    gen_lval(expr);
     printf("  pop rax\n");
     printf("  mov [rax], %s\n", arg[i]);
   }

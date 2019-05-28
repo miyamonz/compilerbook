@@ -38,6 +38,17 @@ void program() {
   funcs[i] = NULL;
 }
 
+Node *param() {
+  expect(TK_INT);
+
+  if( tokens[pos].ty != TK_IDENT )
+    error_at(tokens[pos].input, "int の後には変数名が必要です");
+
+  Node *node = malloc(sizeof(Node));
+  node->op = ND_VARDEF;
+  node->name = tokens[pos++].name;
+  return node;
+}
 Node *function() {
   Node *node = malloc(sizeof(Node));
   node->op = ND_FUNC;
@@ -52,12 +63,9 @@ Node *function() {
 
   expect('(');
   if(! consume(')')) {
-    expect(TK_INT);
-    vec_push(node->args, (void *)expr());
-    while(consume(',')) {
-      expect(TK_INT);
-      vec_push(node->args, (void *)expr());
-    }
+    vec_push(node->args, (void *)param());
+    while(consume(','))
+      vec_push(node->args, (void *)param());
     expect(')');
   }
   expect('{');

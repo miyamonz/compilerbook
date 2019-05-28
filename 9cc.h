@@ -112,6 +112,7 @@ void program();
 Node *function();
 Node *compound_stmt();
 Node *stmt();
+Node *decl();
 Node *expr();
 Node *assign();
 Node *equality();

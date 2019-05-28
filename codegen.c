@@ -1,9 +1,14 @@
 #include "9cc.h"
 
+typedef struct {
+  Type *ty;
+  int offset;
+} Var;
+
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
 
-int gen_vardef(Node *node) {
+Var *gen_vardef(Node *node) {
   if (node->op != ND_VARDEF)
     error("変数宣言ではありません");
 
@@ -11,8 +16,11 @@ int gen_vardef(Node *node) {
     error("%s is already defined.", node->name);
 
   bpoff += 8;
-  map_put(vars, node->name, (void *)(intptr_t)bpoff);
-  return bpoff;
+  Var *var = malloc(sizeof(Var));
+  var->ty = node->ty;
+  var->offset = bpoff;
+  map_put(vars, node->name, (void *)var);
+  return var;
 }
 
 //gen_lval pushes pointer to variable
@@ -21,9 +29,9 @@ void gen_lval(Node *node) {
     if(!map_get(vars, node->name))
       error("variable %s is not defined yet.", node->name);
 
-    int offset = (int)(intptr_t)map_get(vars,node->name);
+    Var *var = (Var *)map_get(vars,node->name);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", offset);
+    printf("  sub rax, %d\n", var->offset);
     printf("  push rax\n");
     return;
   }
@@ -173,9 +181,9 @@ void gen(Node *node) {
     return;
   }
   if (node->op == ND_ADDR) {
-    int offset = (int)(intptr_t)map_get(vars,node->lhs->name);
+    Var *var = (Var *)map_get(vars,node->lhs->name);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", offset);
+    printf("  sub rax, %d\n", var->offset);
     printf("  push rax\n");
     return;
   }
@@ -241,9 +249,9 @@ void gen_func(Node *node) {
     Node *param = (Node *)node->args->data[i];
     if(!param) break;
 
-    int offset = gen_vardef(param);
+    Var *var = gen_vardef(param);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", offset);
+    printf("  sub rax, %d\n", var->offset);
     printf("  push rax\n");
 
     printf("  pop rax\n");

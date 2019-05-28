@@ -94,4 +94,7 @@ try 5 'int add3(int x) { return x+3; } int main() { return add3(2); }'
 try 5 'int add(int x,int y) { return x+y; } int main() { return add(2, 3); }'
 try 13 'int fib(int i) {if(i<=1) return 1; return fib(i-1) + fib(i-2); } int main() { return fib(6); }'
 
+try 0 'int main() { int *x; return 0; }'
+try 0 'int main() { int **x; return 0; }'
+try 0 'int main() { int ***x; return 0; }'
 echo OK

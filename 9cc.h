@@ -6,6 +6,12 @@
 #include <stdnoreturn.h>
 #include <stdint.h>
 
+// type
+typedef struct Type {
+  enum { INT, PTR } ty;
+  struct Type *ptrof;
+} Type;
+
 // util.c
 typedef struct {
   void **data;
@@ -87,6 +93,7 @@ typedef struct Node {
   // ND_IDENT, ND_CALL, ND_FUNC
   char *name;
 
+  Type *ty;
 
   //if
   struct Node *cond;

@@ -1,5 +1,7 @@
 #include "9cc.h"
 
+static Type int_ty = {INT, NULL};
+
 Node *new_node(int op, Node *lhs, Node *rhs) {
   Node *node = malloc(sizeof(Node));
   node->op = op;
@@ -11,6 +13,7 @@ Node *new_node(int op, Node *lhs, Node *rhs) {
 Node *new_node_num(int val) {
   Node *node = malloc(sizeof(Node));
   node->op = ND_NUM;
+  node->ty = &int_ty;
   node->val = val;
   return node;
 }
@@ -30,6 +33,21 @@ static void expect(int ty) {
   sprintf(msg, "%c expected", (char)ty);
   error_at(tokens[pos].input, msg);
 }
+static Type *ptr_of(Type *base) {
+  Type *ty = malloc(sizeof(Type));
+  ty->ty = PTR;
+  ty->ptrof = base;
+  return ty;
+}
+static Type *type() {
+  if(!consume(TK_INT))
+    error_at(tokens[pos].input, "int expected");
+
+  Type *ty = &int_ty;
+  while(consume('*'))
+    ty = ptr_of(ty);
+  return ty;
+}
 
 void program() {
   int i = 0;
@@ -39,14 +57,14 @@ void program() {
 }
 
 Node *param() {
-  expect(TK_INT);
-
-  if( tokens[pos].ty != TK_IDENT )
-    error_at(tokens[pos].input, "int の後には変数名が必要です");
-
   Node *node = malloc(sizeof(Node));
   node->op = ND_VARDEF;
+  node->ty = type();
+
+  if( tokens[pos].ty != TK_IDENT )
+    error_at(tokens[pos].input, "型の後には変数名が必要です");
   node->name = tokens[pos++].name;
+
   return node;
 }
 Node *function() {
@@ -173,13 +191,12 @@ Node *stmt() {
 }
 
 Node *decl() {
-  expect(TK_INT);
-
-  if( tokens[pos].ty != TK_IDENT )
-    error_at(tokens[pos].input, "int の後には変数名が必要です");
-
   Node *node = malloc(sizeof(Node));
   node->op = ND_VARDEF;
+  node->ty = type();
+
+  if( tokens[pos].ty != TK_IDENT )
+    error_at(tokens[pos].input, "型の後には変数名が必要です");
   node->name = tokens[pos++].name;
 
   expect(';');

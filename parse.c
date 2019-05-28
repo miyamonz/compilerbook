@@ -1,8 +1,8 @@
 #include "9cc.h"
 
-Node *new_node(int ty, Node *lhs, Node *rhs) {
+Node *new_node(int op, Node *lhs, Node *rhs) {
   Node *node = malloc(sizeof(Node));
-  node->ty = ty;
+  node->op = op;
   node->lhs = lhs;
   node->rhs = rhs;
   return node;
@@ -10,7 +10,7 @@ Node *new_node(int ty, Node *lhs, Node *rhs) {
 
 Node *new_node_num(int val) {
   Node *node = malloc(sizeof(Node));
-  node->ty = ND_NUM;
+  node->op = ND_NUM;
   node->val = val;
   return node;
 }
@@ -40,7 +40,7 @@ void program() {
 
 Node *function() {
   Node *node = malloc(sizeof(Node));
-  node->ty = ND_FUNC;
+  node->op = ND_FUNC;
   node->args = new_vector();
 
   expect(TK_INT);
@@ -68,7 +68,7 @@ Node *function() {
 
 Node *compound_stmt() {
   Node *node = malloc(sizeof(Node));
-  node->ty = ND_BLOCK;
+  node->op = ND_BLOCK;
   int i = 0;
   while (! consume('}')) {
     node->stmts[i++] = stmt();
@@ -83,7 +83,7 @@ Node *stmt() {
       error_at(tokens[pos].input, "int の後には変数名が必要です");
 
     node = malloc(sizeof(Node));
-    node->ty = ND_VARDEF;
+    node->op = ND_VARDEF;
     node->name = tokens[pos++].name;
 
     expect(';');
@@ -93,7 +93,7 @@ Node *stmt() {
   if(consume(TK_IF)) {
     expect('(');
     node = malloc(sizeof(Node));
-    node->ty = ND_IF;
+    node->op = ND_IF;
     node->cond = expr();
     expect(')');
     node->then = stmt();
@@ -105,7 +105,7 @@ Node *stmt() {
   if(consume(TK_WHILE)) {
     expect('(');
     node = malloc(sizeof(Node));
-    node->ty = ND_WHILE;
+    node->op = ND_WHILE;
     node->cond = expr();
     expect(')');
     node->body = stmt();
@@ -114,7 +114,7 @@ Node *stmt() {
 
   if(consume(TK_FOR)) {
     node = malloc(sizeof(Node));
-    node->ty = ND_FOR;
+    node->op = ND_FOR;
 
     expect('(');
 
@@ -151,7 +151,7 @@ Node *stmt() {
 
   if (consume('{')) {
     node = malloc(sizeof(Node));
-    node->ty = ND_BLOCK;
+    node->op = ND_BLOCK;
 
     int i=0;
     while(! consume('}'))
@@ -162,7 +162,7 @@ Node *stmt() {
 
   if (consume(TK_RETURN)) {
     node = malloc(sizeof(Node));
-    node->ty = ND_RETURN;
+    node->op = ND_RETURN;
     node->lhs = expr();
   } else {
     node = expr();
@@ -261,12 +261,12 @@ Node *term() {
 
     // identifier
     if(!consume('(')) {
-      node->ty = ND_IDENT;
+      node->op = ND_IDENT;
       return node;
     }
 
     // function call
-    node->ty = ND_CALL;
+    node->op = ND_CALL;
     node->args = new_vector();
     if(consume(')'))
       return node;

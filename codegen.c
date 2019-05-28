@@ -5,7 +5,7 @@ int len = sizeof(arg)/sizeof(*arg);
 
 //lval returns pointer to variable
 void gen_lval(Node *node) {
-  if (node->ty != ND_IDENT)
+  if (node->op != ND_IDENT)
     error("代入の左辺値が変数ではありません");
 
   if(!map_get(vars, node->name))
@@ -18,12 +18,12 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
-  if (node->ty == ND_NUM) {
+  if (node->op == ND_NUM) {
     printf("  push %d\n", node->val);
     return;
   }
 
-  if (node->ty == ND_IDENT) {
+  if (node->op == ND_IDENT) {
     gen_lval(node);
     printf("  pop rax\n");
     printf("  mov rax, [rax]\n");
@@ -31,7 +31,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == ND_VARDEF) {
+  if (node->op == ND_VARDEF) {
     if(map_get(vars, node->name))
       error("%s is already defined.", node->name);
 
@@ -40,7 +40,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == ND_CALL) {
+  if (node->op == ND_CALL) {
     printf("  push rbx\n");
     printf("  push rbp\n");
     printf("  push rsp\n");
@@ -71,7 +71,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == ND_RETURN) {
+  if (node->op == ND_RETURN) {
     gen(node->lhs);
     printf("  pop rax\n");
     printf("  mov rsp, rbp\n");
@@ -79,7 +79,7 @@ void gen(Node *node) {
     printf("  ret\n");
     return;
   }
-  if (node->ty == ND_IF) {
+  if (node->op == ND_IF) {
     gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
@@ -99,7 +99,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == ND_WHILE) {
+  if (node->op == ND_WHILE) {
     printf(".Lbegin%d:\n", label);
     gen(node->cond);
     printf("  pop rax\n");
@@ -112,7 +112,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == ND_FOR) {
+  if (node->op == ND_FOR) {
     if(node->init)
       gen(node->init);
     printf(".Lbegin%d:\n", label);
@@ -130,7 +130,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == ND_BLOCK) {
+  if (node->op == ND_BLOCK) {
 
     int len = sizeof(node->stmts) / sizeof(node->stmts[0]);
     for(int i=0; i<len; i++) {
@@ -141,7 +141,7 @@ void gen(Node *node) {
     return;
   }
 
-  if (node->ty == '=') {
+  if (node->op == '=') {
     gen_lval(node->lhs);
     gen(node->rhs);
 
@@ -158,7 +158,7 @@ void gen(Node *node) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  switch (node->ty) {
+  switch (node->op) {
     case '+':
       printf("  add rax, rdi\n");
       break;
@@ -198,7 +198,7 @@ void gen(Node *node) {
 }
 
 void gen_func(Node *node) {
-  if (node->ty != ND_FUNC)
+  if (node->op != ND_FUNC)
     error("関数ではありません");
 
   printf("%s:\n", node->name);

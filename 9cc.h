@@ -79,11 +79,14 @@ enum {
 };
 
 typedef struct Node {
-  int ty;
+  int op;
   struct Node *lhs;
   struct Node *rhs;
   int val;
-  char *name; // only use when ty is ND_IDENT
+
+  // ND_IDENT, ND_CALL, ND_FUNC
+  char *name;
+
 
   //if
   struct Node *cond;

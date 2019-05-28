@@ -275,6 +275,8 @@ Node *unary() {
     return new_node('-', new_node_num(0), term());
   if(consume('*'))
     return new_node(ND_DEREF, mul(), NULL);
+  if(consume('&'))
+    return new_node(ND_ADDR, mul(), NULL);
   return term();
 }
 Node *term() {

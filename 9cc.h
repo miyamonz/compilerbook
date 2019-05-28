@@ -83,6 +83,7 @@ enum {
   ND_NE,
   ND_LE,
   ND_DEREF,
+  ND_ADDR,
 };
 
 typedef struct Node {

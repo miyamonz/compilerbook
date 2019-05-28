@@ -172,6 +172,13 @@ void gen(Node *node) {
     printf("  push rax\n");
     return;
   }
+  if (node->op == ND_ADDR) {
+    int offset = (int)(intptr_t)map_get(vars,node->lhs->name);
+    printf("  mov rax, rbp\n");
+    printf("  sub rax, %d\n", offset);
+    printf("  push rax\n");
+    return;
+  }
 
   gen(node->lhs);
   gen(node->rhs);

@@ -111,4 +111,6 @@ try 0 'int main() { int ***x; return 0; }'
 try 42 'int main() { int *p; p = alloc(42); return *p; }'
 
 try 42 'int main() { int *p; p = alloc(0); *p = 42; return *p; }'
+
+try 42 'int main() { int x; int *p; p = &x; *p = 42; return x; }'
 echo OK

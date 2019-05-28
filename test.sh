@@ -15,9 +15,19 @@ try() {
     exit 1
   fi
 }
-echo 'int foo() { printf("OK from foo\n"); }' | gcc -xc -c -o tmp-foo.o -
-echo 'int two() { return 2; }' | gcc -xc -c -o tmp-two.o -
-echo 'int plus(int x, int y) { return x + y; }' | gcc -xc -c -o tmp-plus.o -
+cat << 'EOF' | gcc -xc -c -o tmp-test.o -
+int foo() {
+  printf("OK from foo\n");
+}
+int two() { return 2; }
+int plus(int x,int y) { return x+y; }
+
+int *alloc(int x) {
+  static int arr[1];
+  arr[0] = x;
+  return arr;
+}
+EOF
 
 try 0 'int main() { return 0; }'
 try 42 'int main() { return 42; }'
@@ -97,4 +107,6 @@ try 13 'int fib(int i) {if(i<=1) return 1; return fib(i-1) + fib(i-2); } int mai
 try 0 'int main() { int *x; return 0; }'
 try 0 'int main() { int **x; return 0; }'
 try 0 'int main() { int ***x; return 0; }'
+
+try 42 'int main() { int *p; p = alloc(42); return *p; }'
 echo OK

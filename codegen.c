@@ -15,18 +15,24 @@ int gen_vardef(Node *node) {
   return bpoff;
 }
 
-//lval returns pointer to variable
+//gen_lval pushes pointer to variable
 void gen_lval(Node *node) {
-  if (node->op != ND_IDENT)
-    error("代入の左辺値が変数ではありません");
+  if (node->op == ND_IDENT) {
+    if(!map_get(vars, node->name))
+      error("variable %s is not defined yet.", node->name);
 
-  if(!map_get(vars, node->name))
-    error("variable %s is not defined yet.", node->name);
+    int offset = (int)(intptr_t)map_get(vars,node->name);
+    printf("  mov rax, rbp\n");
+    printf("  sub rax, %d\n", offset);
+    printf("  push rax\n");
+    return;
+  }
+  if(node->op == ND_DEREF) {
+    gen(node->lhs);
+    return;
+  }
 
-  int offset = (int)(intptr_t)map_get(vars,node->name);
-  printf("  mov rax, rbp\n");
-  printf("  sub rax, %d\n", offset);
-  printf("  push rax\n");
+  error("代入の左辺値が不正です");
 }
 
 void gen(Node *node) {

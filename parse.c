@@ -43,6 +43,8 @@ Node *function() {
   node->ty = ND_FUNC;
   node->args = new_vector();
 
+  expect(TK_INT);
+
   if (tokens[pos].ty != TK_IDENT) {
     error_at(tokens[pos].input, "function name expected");
   }

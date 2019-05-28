@@ -1,9 +1,22 @@
 #include "9cc.h"
+#include "assert.h"
 
 typedef struct {
   Type *ty;
   int offset;
 } Var;
+
+int isPtr(Node *node) {
+  if (node->op != ND_IDENT) return 0;
+  Var *var = (Var *)map_get(vars,node->name);
+  return var->ty->ty == PTR;
+}
+int size_of(Type *ty) {
+  if (ty->ty == INT)
+    return 4;
+  assert(ty->ty == PTR);
+  return 8;
+}
 
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
@@ -194,12 +207,29 @@ void gen(Node *node) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
+  Type *ltype = node->lhs->ty;
+  Type *rtype = node->rhs->ty;
+  int lIsPtr = isPtr(node->lhs);
+  int rIsPtr = isPtr(node->rhs);
   switch (node->op) {
     case '+':
-      printf("  add rax, rdi\n");
-      break;
+      if(lIsPtr && rIsPtr)
+        error(" pointer + pointer is invalid");
     case '-':
-      printf("  sub rax, rdi\n");
+      if(lIsPtr && !rIsPtr) {
+        printf("  push rax\n"); // push lhs
+
+        //rhs * size
+        printf("  mov rax, rdi\n");
+        printf("  push %d\n", size_of(rtype));
+        printf("  pop rdi\n");
+        printf("  imul rdi\n");
+        printf("  mov rdi, rax\n");
+
+        printf("  pop rax\n"); // pop lhs
+      }
+
+      printf("  %s rax, rdi\n", node->op == '+' ? "add" : "sub");
       break;
     case '*':
       printf("  imul rdi\n");

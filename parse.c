@@ -50,9 +50,12 @@ Node *function() {
 
   expect('(');
   if(! consume(')')) {
+    expect(TK_INT);
     vec_push(node->args, (void *)expr());
-    while(consume(','))
+    while(consume(',')) {
+      expect(TK_INT);
       vec_push(node->args, (void *)expr());
+    }
     expect(')');
   }
   expect('{');

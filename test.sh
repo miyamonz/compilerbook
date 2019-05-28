@@ -73,25 +73,25 @@ try 101 'main() {if(1 == 3) return 100; if(100) return 101; return 1; }'
 try 2 'main() { if(1) return 2; else return 3; return 4; }'
 try 3 'main() { if(0) return 2; else return 3; return 4; }'
 
-try 55 'main() {i=0; j=0; while(i<10) j = j + (i = i + 1); return j; }'
+try 55 'main() {int i; int j; i=0; j=0; while(i<10) j = j + (i = i + 1); return j; }'
 
-try 45 'main() {j=0; for(i=0; i<10; i = i+1) j = j + i; return j; }'
-try 45 'main() {j=0; i=0; for(; i<10; i = i+1) j = j + i; return j; }'
+try 45 'main() {int i; int j; j=0; for(i=0; i<10; i = i+1) j = j + i; return j; }'
+try 45 'main() {int i; int j; j=0; i=0; for(; i<10; i = i+1) j = j + i; return j; }'
 
-try 55 'main() { i=0; j=0; while(i<10) { i=i+1;  j = j + i; } return j; }'
-try 200 'main() { i = 0; if( i == 0 ){ i = 100; i = i * 2;  } return i; }'
+try 55 'main() {int i; int j; i=0; j=0; while(i<10) { i=i+1;  j = j + i; } return j; }'
+try 200 'main() {int i; i = 0; if( i == 0 ){ i = 100; i = i * 2;  } return i; }'
 
 try 100 'main() { foo(); return 100; }'
-try 100 'main() { for(i=0; i<5; i=i+1) {foo();} return 100; }'
+try 100 'main() {int i; for(i=0; i<5; i=i+1) {foo();} return 100; }'
 try 9 'main() { return 1 + two() * 4; }'
 
 try 3 'main() { return plus(1,2); }'
 try 4 'main() { return 1 + plus(1,2); }'
 try 50 'main() { return 2 + plus(2,10) * 4; }'
 
-try 5 'two() { return 2; } main() { return 2 *two() + 1; }'
-try 5 'add3(x) { return x+3; } main() { return add3(2); }'
-try 5 'add(x, y) { return x+y; } main() { return add(2, 3); }'
-try 13 'fib(i) { if(i<=1) return 1; return fib(i-1) + fib(i-2); } main() { return fib(6); }'
+try 11 'five() { return 5; } main() { return 2 * five() + 1; }'
+try 5 'add3(int x) { return x+3; } main() { return add3(2); }'
+try 5 'add(int x,int y) { return x+y; } main() { return add(2, 3); }'
+try 13 'fib(int i) {if(i<=1) return 1; return fib(i-1) + fib(i-2); } main() { return fib(6); }'
 
 echo OK

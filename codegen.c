@@ -212,6 +212,10 @@ void gen_func(Node *node) {
   for(int i=0; i<len; i++) {
     Node *expr = (Node *)node->args->data[i];
     if(!expr) break;
+
+    bpoff += 8;
+    map_put(vars, expr->name, (void *)(intptr_t)bpoff);
+
     gen_lval(expr);
     printf("  pop rax\n");
     printf("  mov [rax], %s\n", arg[i]);

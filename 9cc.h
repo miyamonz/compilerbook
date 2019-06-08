@@ -48,6 +48,7 @@ enum {
   TK_ELSE,
   TK_WHILE,
   TK_FOR,
+  TK_SIZEOF,
   TK_EQ, // ==
   TK_NE, // !=
   TK_LE, // <=
@@ -78,6 +79,7 @@ enum {
   ND_IF,
   ND_WHILE,
   ND_FOR,
+  ND_SIZEOF,
   ND_BLOCK,
   ND_EQ,
   ND_NE,

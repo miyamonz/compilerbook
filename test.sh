@@ -144,4 +144,7 @@ try 8 'int main() { int *p; p = alloc1(3,5); return *p + *(1+p); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(p-1); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(-1+p); }'
 try 2 'int main() { int **p; p = alloc_ptr_ptr(2); return **p; }'
+
+try 4 'int main() { int x; return sizeof x; }'
+try 4 'int main() { int x; return sizeof(x); }'
 echo OK

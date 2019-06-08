@@ -269,6 +269,16 @@ Node *mul() {
 }
 
 Node *unary() {
+  if(consume(TK_SIZEOF)) {
+    Node* node = unary();
+    printf("# TK_SIZEOF %d\n", node->ty);
+    if(node->ty == &int_ty)
+      return new_node_num(4);
+    else if(node->ty->ty == PTR)
+      return new_node_num(8);
+    else
+      error_at(tokens[pos].input, "invalid typeof. not int or pointer");
+  }
   if(consume('+'))
     return term();
   if(consume('-'))

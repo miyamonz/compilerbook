@@ -17,6 +17,13 @@ Node *new_node_num(int val) {
   node->val = val;
   return node;
 }
+Node *new_node_deref() {
+  return new_node(ND_DEREF, mul(), NULL);
+}
+static Type *ptr_of(Type *base);
+Node *new_node_addr() {
+  return new_node(ND_ADDR, mul(), NULL);
+}
 
 
 int pos = 0;
@@ -274,9 +281,9 @@ Node *unary() {
   if(consume('-'))
     return new_node('-', new_node_num(0), term());
   if(consume('*'))
-    return new_node(ND_DEREF, mul(), NULL);
+    return new_node_deref();
   if(consume('&'))
-    return new_node(ND_ADDR, mul(), NULL);
+    return new_node_addr();
   return term();
 }
 Node *term() {

@@ -1,9 +1,15 @@
 #include "9cc.h"
 
+Token *new_token(TokenKind kind, Token *cur, char *str) {
+  Token *tok = calloc(1, sizeof(Token));
+  tok->kind = kind;
+  tok->str = str;
+  cur->next = tok;
+  return tok;
+}
+
 Map *keywords;
-void tokenize() {
-  char *p = user_input;
-  int i = 0;
+Token *tokenize(char *p) {
   keywords = new_map();
   map_put(keywords, "return", (void *) TK_RETURN);
   map_put(keywords, "if", (void *) TK_IF);
@@ -11,6 +17,10 @@ void tokenize() {
   map_put(keywords, "while", (void *) TK_WHILE);
   map_put(keywords, "for", (void *) TK_FOR);
   map_put(keywords, "int", (void *) TK_INT);
+
+  Token head;
+  head.next = NULL;
+  Token *cur = &head;
 
   while (*p) {
     // 空白文字をスキップ
@@ -20,34 +30,26 @@ void tokenize() {
     }
 
     if (strncmp(p, "==", 2) == 0) {
-      tokens[i].kind = TK_EQ;
-      tokens[i].str = p;
-      tokens[i].len = 2;
-      i++;
+      cur = new_token(TK_EQ, cur, p);
+      cur->len = 2;
       p += 2;
       continue;
     }
     if (strncmp(p, "!=", 2) == 0) {
-      tokens[i].kind = TK_NE;
-      tokens[i].str = p;
-      tokens[i].len = 2;
-      i++;
+      cur = new_token(TK_NE, cur, p);
+      cur->len = 2;
       p += 2;
       continue;
     }
     if (strncmp(p, "<=", 2) == 0) {
-      tokens[i].kind = TK_LE;
-      tokens[i].str = p;
-      tokens[i].len = 2;
-      i++;
+      cur = new_token(TK_LE, cur, p);
+      cur->len = 2;
       p += 2;
       continue;
     }
     if (strncmp(p, ">=", 2) == 0) {
-      tokens[i].kind = TK_GE;
-      tokens[i].str = p;
-      tokens[i].len = 2;
-      i++;
+      cur = new_token(TK_GE, cur, p);
+      cur->len = 2;
       p += 2;
       continue;
     }
@@ -60,37 +62,30 @@ void tokenize() {
       int kind = (intptr_t) map_get(keywords, name);
       if(!kind)
         kind = TK_IDENT;
-      tokens[i].kind = kind;
-      tokens[i].str = p;
-      tokens[i].len = len;
-      tokens[i].name = name;
-      i++;
+      cur = new_token(kind, cur, p);
+      cur->len = len;
+      cur->name = name;
       p += len;
       continue;
     }
 
 
     if (strchr("+-*/()<>;={},&", *p)) {
-      tokens[i].kind = *p;
-      tokens[i].str = p;
-      tokens[i].len = 1;
-      i++;
+      cur = new_token(*p, cur, p);
+      cur->len = 1;
       p++;
       continue;
     }
 
     if (isdigit(*p)) {
-      tokens[i].kind = TK_NUM;
-      tokens[i].str = p;
-      tokens[i].val = strtol(p, &p, 10);
-      i++;
+      cur = new_token(TK_NUM, cur, p);
+      cur->val = strtol(p, &p, 10);
       continue;
     }
 
     error_at(p, "トークナイズできません");
   }
 
-  tokens[i].kind = TK_EOF;
-  tokens[i].str = p;
-
+  new_token(TK_EOF, cur, p);
+  return head.next;
 }

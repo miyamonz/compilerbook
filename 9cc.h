@@ -58,6 +58,7 @@ typedef enum {
 typedef struct Token Token;
 struct Token {
   TokenKind kind;
+  Token *next;
   int val; // kind がTK_NUMのときの数値
   char *name; // kind == TK_IDENTのとき、変数名
   char *str; //トークン文字列
@@ -65,8 +66,9 @@ struct Token {
 };
 
 char *user_input;
-Token tokens[100];
-void tokenize();
+//現在着目しているトークン
+Token *token;
+Token *tokenize(char *);
 
 
 //node

@@ -25,12 +25,10 @@ Node *new_node_addr() {
   return new_node(ND_ADDR, mul(), NULL);
 }
 
-
-int pos = 0;
 int consume(int ty) {
-  if (tokens[pos].kind != ty)
+  if (token->kind != ty)
     return 0;
-  pos++;
+  token = token->next;
   return 1;
 }
 static void expect(int ty) {
@@ -38,8 +36,16 @@ static void expect(int ty) {
 
   char msg[100] = "\0";
   sprintf(msg, "%c expected", (char)ty);
-  error_at(tokens[pos].str, msg);
+  error_at(token->str, msg);
 }
+static int expect_number() {
+  if(token->kind != TK_NUM)
+    error_at(token->str, "数ではありません");
+  int val = token->val;
+  token = token->next;
+  return val;
+}
+
 static Type *ptr_of(Type *base) {
   Type *ty = malloc(sizeof(Type));
   ty->ty = PTR;
@@ -48,7 +54,7 @@ static Type *ptr_of(Type *base) {
 }
 static Type *type() {
   if(!consume(TK_INT))
-    error_at(tokens[pos].str, "int expected");
+    error_at(token->str, "int expected");
 
   Type *ty = &int_ty;
   while(consume('*'))
@@ -58,7 +64,7 @@ static Type *type() {
 
 void program() {
   int i = 0;
-  while(tokens[pos].kind != TK_EOF)
+  while(token->kind != TK_EOF)
     funcs[i++] = function();
   funcs[i] = NULL;
 }
@@ -68,9 +74,10 @@ Node *param() {
   node->op = ND_VARDEF;
   node->ty = type();
 
-  if( tokens[pos].kind != TK_IDENT )
-    error_at(tokens[pos].str, "型の後には変数名が必要です");
-  node->name = tokens[pos++].name;
+  if( token->kind != TK_IDENT )
+    error_at(token->str, "型の後には変数名が必要です");
+  node->name = token->name;
+  token = token->next;
 
   return node;
 }
@@ -81,10 +88,11 @@ Node *function() {
 
   expect(TK_INT);
 
-  if (tokens[pos].kind != TK_IDENT) {
-    error_at(tokens[pos].str, "function name expected");
+  if (token->kind != TK_IDENT) {
+    error_at(token->str, "function name expected");
   }
-  node->name = tokens[pos++].name;
+  node->name = token->name;
+  token = token->next;
 
   expect('(');
   if(! consume(')')) {
@@ -111,7 +119,7 @@ Node *compound_stmt() {
 Node *stmt() {
   Node *node;
 
-  if(tokens[pos].kind == TK_INT)
+  if(token->kind == TK_INT)
     return decl();
 
   if(consume(TK_IF)) {
@@ -143,7 +151,7 @@ Node *stmt() {
     expect('(');
 
     // init
-    if( tokens[pos].kind == ';' ) {
+    if( token->kind == ';' ) {
       node->init = NULL;
       consume(';');
     } else {
@@ -152,7 +160,7 @@ Node *stmt() {
     }
 
     // cond
-    if( tokens[pos].kind == ';' ) {
+    if( token->kind == ';' ) {
       node->cond = NULL;
       consume(';');
     } else {
@@ -161,7 +169,7 @@ Node *stmt() {
     }
 
     // inc
-    if( tokens[pos].kind == ')' ) {
+    if( token->kind == ')' ) {
       node->inc = NULL;
       consume(')');
     } else {
@@ -202,9 +210,10 @@ Node *decl() {
   node->op = ND_VARDEF;
   node->ty = type();
 
-  if( tokens[pos].kind != TK_IDENT )
-    error_at(tokens[pos].str, "型の後には変数名が必要です");
-  node->name = tokens[pos++].name;
+  if( token->kind != TK_IDENT )
+    error_at(token->str, "型の後には変数名が必要です");
+  node->name = token->name;
+  token = token->next;
 
   expect(';');
   return node;
@@ -293,12 +302,14 @@ Node *term() {
     return node;
   }
 
-  if (tokens[pos].kind == TK_NUM)
-    return new_node_num(tokens[pos++].val);
+  if (token->kind == TK_NUM)
+    return new_node_num(expect_number());
 
-  if (tokens[pos].kind == TK_IDENT) {
+  if (token->kind == TK_IDENT) {
     Node *node = malloc(sizeof(Node));
-    node->name = tokens[pos++].name;
+    node->name = token->name;
+    token = token->next;
+
 
     // identifier
     if(!consume('(')) {
@@ -319,5 +330,5 @@ Node *term() {
     return node;
   }
 
-  error_at(tokens[pos].str, "数値でも識別子でもないトークンです");
+  error_at(token->str, "数値でも識別子でもないトークンです");
 }

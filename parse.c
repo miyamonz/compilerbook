@@ -85,10 +85,20 @@ static Type *type() {
   return ty;
 }
 
+//variable
+LVar *find_lvar(Token *tok) {
+  for(LVar *var = locals; var; var = var->next) {
+    if(var->len == token->len && !memcmp(tok->str, tok->name, var->len))
+      return var;
+  }
+  return NULL;
+}
+
 void program() {
   int i = 0;
-  while(token->kind != TK_EOF)
+  while(token->kind != TK_EOF) {
     funcs[i++] = function();
+  }
   funcs[i] = NULL;
 }
 
@@ -323,13 +333,25 @@ Node *term() {
 
   if (token->kind == TK_IDENT) {
     Node *node = malloc(sizeof(Node));
-    node->name = token->name;
-    token = token->next;
-
+    Token *tok = consume_ident();
+    node->name = tok->name;
 
     // identifier
     if(!consume('(')) {
       node->op = ND_IDENT;
+
+      LVar *lvar = find_lvar(tok);
+      if (lvar) {
+        node->offset = lvar->offset;
+      } else {
+        lvar = calloc(1, sizeof(LVar));
+        lvar->next = locals;
+        lvar->name = tok->str;
+        lvar->len = token->len;
+        lvar->offset = locals == NULL ? 0 : locals->offset + 8;
+        node->offset = lvar->offset;
+        locals = lvar;
+      }
       return node;
     }
 

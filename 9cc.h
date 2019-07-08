@@ -32,6 +32,15 @@ void *map_get(Map *map, char *key);
 Map *vars;
 int bpoff;
 
+typedef struct LVar LVar;
+struct LVar {
+  LVar *next;
+  char *name;
+  int len;
+  int offset;
+};
+LVar *locals;
+
 void runtest();
 noreturn void error(char *fmt, ...);
 noreturn void error_at(char *loc, char *msg, ...);
@@ -98,6 +107,7 @@ typedef struct Node {
 
   // ND_IDENT, ND_CALL, ND_FUNC
   char *name;
+  int offset;
 
   Type *ty;
 

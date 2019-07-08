@@ -22,6 +22,7 @@ void tokenize() {
     if (strncmp(p, "==", 2) == 0) {
       tokens[i].kind = TK_EQ;
       tokens[i].str = p;
+      tokens[i].len = 2;
       i++;
       p += 2;
       continue;
@@ -29,6 +30,7 @@ void tokenize() {
     if (strncmp(p, "!=", 2) == 0) {
       tokens[i].kind = TK_NE;
       tokens[i].str = p;
+      tokens[i].len = 2;
       i++;
       p += 2;
       continue;
@@ -36,6 +38,7 @@ void tokenize() {
     if (strncmp(p, "<=", 2) == 0) {
       tokens[i].kind = TK_LE;
       tokens[i].str = p;
+      tokens[i].len = 2;
       i++;
       p += 2;
       continue;
@@ -43,6 +46,7 @@ void tokenize() {
     if (strncmp(p, ">=", 2) == 0) {
       tokens[i].kind = TK_GE;
       tokens[i].str = p;
+      tokens[i].len = 2;
       i++;
       p += 2;
       continue;
@@ -58,6 +62,7 @@ void tokenize() {
         kind = TK_IDENT;
       tokens[i].kind = kind;
       tokens[i].str = p;
+      tokens[i].len = len;
       tokens[i].name = name;
       i++;
       p += len;
@@ -68,6 +73,7 @@ void tokenize() {
     if (strchr("+-*/()<>;={},&", *p)) {
       tokens[i].kind = *p;
       tokens[i].str = p;
+      tokens[i].len = 1;
       i++;
       p++;
       continue;

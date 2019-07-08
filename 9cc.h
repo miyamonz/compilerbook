@@ -122,18 +122,6 @@ typedef struct Node {
 
 Node *funcs[100];
 void program();
-Node *function();
-Node *compound_stmt();
-Node *stmt();
-Node *decl();
-Node *expr();
-Node *assign();
-Node *equality();
-Node *relational();
-Node *add();
-Node *mul();
-Node *unary();
-Node *term();
 
 void gen(Node *node);
 void gen_func(Node *node);

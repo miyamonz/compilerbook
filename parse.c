@@ -1,5 +1,19 @@
 #include "9cc.h"
 
+// 前方宣言
+Node *function();
+Node *compound_stmt();
+Node *stmt();
+Node *decl();
+Node *expr();
+Node *assign();
+Node *equality();
+Node *relational();
+Node *add();
+Node *mul();
+Node *unary();
+Node *term();
+
 static Type int_ty = {INT, NULL};
 
 Node *new_node(int op, Node *lhs, Node *rhs) {
@@ -25,6 +39,7 @@ Node *new_node_addr() {
   return new_node(ND_ADDR, mul(), NULL);
 }
 
+// util
 int consume(int ty) {
   if (token->kind != ty)
     return 0;

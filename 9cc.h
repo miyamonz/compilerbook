@@ -34,7 +34,7 @@ int bpoff;
 
 void runtest();
 noreturn void error(char *fmt, ...);
-noreturn void error_at(char *loc, char *msg);
+noreturn void error_at(char *loc, char *msg, ...);
 int is_alpha(char c);
 int is_digit(char c);
 int is_alnum(char c);

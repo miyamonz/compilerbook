@@ -242,7 +242,7 @@ Node *decl() {
   lvar = calloc(1, sizeof(LVar));
   lvar->next = locals;
   lvar->name = tok->str;
-  lvar->len = token->len;
+  lvar->len = tok->len;
   lvar->offset = locals == NULL ? 0 : locals->offset + 8;
   node->offset = lvar->offset;
   locals = lvar;
@@ -346,17 +346,10 @@ Node *term() {
       node->op = ND_IDENT;
 
       LVar *lvar = find_lvar(tok);
-      if (lvar) {
-        node->offset = lvar->offset;
-      } else {
-        lvar = calloc(1, sizeof(LVar));
-        lvar->next = locals;
-        lvar->name = tok->str;
-        lvar->len = token->len;
-        lvar->offset = locals == NULL ? 0 : locals->offset + 8;
-        node->offset = lvar->offset;
-        locals = lvar;
-      }
+      if (lvar == NULL)
+        error_at(token->str, "variable not defined yet.");
+
+      node->offset = lvar->offset;
       return node;
     }
 

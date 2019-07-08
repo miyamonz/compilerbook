@@ -21,6 +21,9 @@ noreturn void error_at(char *loc, char *msg, ...) {
   fprintf(stderr, "^ ");
   vfprintf(stderr, msg, ap);
   fprintf(stderr, "\n");
+  fprintf(stderr, "--- defined variables\n");
+  for(LVar *var = locals; var; var = var->next)
+    fprintf(stderr, "- %.*s\n", var->len, var->name);
   exit(1);
 }
 

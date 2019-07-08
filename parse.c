@@ -88,7 +88,7 @@ static Type *type() {
 //variable
 LVar *find_lvar(Token *tok) {
   for(LVar *var = locals; var; var = var->next) {
-    if(var->len == token->len && !memcmp(tok->str, tok->name, var->len))
+    if(var->len == tok->len && !memcmp(tok->str, var->name, var->len))
       return var;
   }
   return NULL;
@@ -102,16 +102,6 @@ void program() {
   funcs[i] = NULL;
 }
 
-Node *param() {
-  Node *node = malloc(sizeof(Node));
-  node->op = ND_VARDEF;
-  node->ty = type();
-
-  Token *tok = consume_ident();
-  node->name = tok->name;
-
-  return node;
-}
 Node *function() {
   Node *node = malloc(sizeof(Node));
   node->op = ND_FUNC;
@@ -124,9 +114,9 @@ Node *function() {
 
   expect('(');
   if(! consume(')')) {
-    vec_push(node->args, (void *)param());
+    vec_push(node->args, (void *)decl());
     while(consume(','))
-      vec_push(node->args, (void *)param());
+      vec_push(node->args, (void *)decl());
     expect(')');
   }
   expect('{');
@@ -147,8 +137,11 @@ Node *compound_stmt() {
 Node *stmt() {
   Node *node;
 
-  if(token->kind == TK_INT)
-    return decl();
+  if(token->kind == TK_INT) {
+    Node *d = decl();
+    expect(';');
+    return d;
+  }
 
   if(consume(TK_IF)) {
     expect('(');
@@ -241,7 +234,19 @@ Node *decl() {
   Token *tok = consume_ident();
   node->name = tok->name;
 
-  expect(';');
+  LVar *lvar = find_lvar(tok);
+  if (lvar)
+    error_at(token->str, "variable %s is already defined.", tok->name);
+
+  // create new variable
+  lvar = calloc(1, sizeof(LVar));
+  lvar->next = locals;
+  lvar->name = tok->str;
+  lvar->len = token->len;
+  lvar->offset = locals == NULL ? 0 : locals->offset + 8;
+  node->offset = lvar->offset;
+  locals = lvar;
+
   return node;
 }
 

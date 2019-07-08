@@ -46,6 +46,14 @@ int consume(int ty) {
   token = token->next;
   return 1;
 }
+
+Token *consume_ident() {
+  if( token->kind != TK_IDENT )
+    error_at(token->str, "ident expected.");
+  Token *t = token;
+  token = token->next;
+  return t;
+}
 static void expect(int ty) {
   if(consume(ty)) return;
 
@@ -89,10 +97,8 @@ Node *param() {
   node->op = ND_VARDEF;
   node->ty = type();
 
-  if( token->kind != TK_IDENT )
-    error_at(token->str, "型の後には変数名が必要です");
-  node->name = token->name;
-  token = token->next;
+  Token *tok = consume_ident();
+  node->name = tok->name;
 
   return node;
 }
@@ -103,11 +109,8 @@ Node *function() {
 
   expect(TK_INT);
 
-  if (token->kind != TK_IDENT) {
-    error_at(token->str, "function name expected");
-  }
-  node->name = token->name;
-  token = token->next;
+  Token *tok = consume_ident();
+  node->name = tok->name;
 
   expect('(');
   if(! consume(')')) {
@@ -225,10 +228,8 @@ Node *decl() {
   node->op = ND_VARDEF;
   node->ty = type();
 
-  if( token->kind != TK_IDENT )
-    error_at(token->str, "型の後には変数名が必要です");
-  node->name = token->name;
-  token = token->next;
+  Token *tok = consume_ident();
+  node->name = tok->name;
 
   expect(';');
   return node;

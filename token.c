@@ -21,28 +21,28 @@ void tokenize() {
 
     if (strncmp(p, "==", 2) == 0) {
       tokens[i].kind = TK_EQ;
-      tokens[i].input = p;
+      tokens[i].str = p;
       i++;
       p += 2;
       continue;
     }
     if (strncmp(p, "!=", 2) == 0) {
       tokens[i].kind = TK_NE;
-      tokens[i].input = p;
+      tokens[i].str = p;
       i++;
       p += 2;
       continue;
     }
     if (strncmp(p, "<=", 2) == 0) {
       tokens[i].kind = TK_LE;
-      tokens[i].input = p;
+      tokens[i].str = p;
       i++;
       p += 2;
       continue;
     }
     if (strncmp(p, ">=", 2) == 0) {
       tokens[i].kind = TK_GE;
-      tokens[i].input = p;
+      tokens[i].str = p;
       i++;
       p += 2;
       continue;
@@ -57,7 +57,7 @@ void tokenize() {
       if(!kind)
         kind = TK_IDENT;
       tokens[i].kind = kind;
-      tokens[i].input = p;
+      tokens[i].str = p;
       tokens[i].name = name;
       i++;
       p += len;
@@ -67,7 +67,7 @@ void tokenize() {
 
     if (strchr("+-*/()<>;={},&", *p)) {
       tokens[i].kind = *p;
-      tokens[i].input = p;
+      tokens[i].str = p;
       i++;
       p++;
       continue;
@@ -75,7 +75,7 @@ void tokenize() {
 
     if (isdigit(*p)) {
       tokens[i].kind = TK_NUM;
-      tokens[i].input = p;
+      tokens[i].str = p;
       tokens[i].val = strtol(p, &p, 10);
       i++;
       continue;
@@ -85,6 +85,6 @@ void tokenize() {
   }
 
   tokens[i].kind = TK_EOF;
-  tokens[i].input = p;
+  tokens[i].str = p;
 
 }

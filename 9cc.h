@@ -55,12 +55,14 @@ typedef enum {
   TK_EOF,
 } TokenKind;
 
-typedef struct {
+typedef struct Token Token;
+struct Token {
   TokenKind kind;
-  int val;
+  int val; // kind がTK_NUMのときの数値
   char *name; // kind == TK_IDENTのとき、変数名
-  char *input;
-} Token;
+  char *str; //トークン文字列
+  int len; //トークン長さ
+};
 
 char *user_input;
 Token tokens[100];

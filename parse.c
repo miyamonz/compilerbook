@@ -38,7 +38,7 @@ static void expect(int ty) {
 
   char msg[100] = "\0";
   sprintf(msg, "%c expected", (char)ty);
-  error_at(tokens[pos].input, msg);
+  error_at(tokens[pos].str, msg);
 }
 static Type *ptr_of(Type *base) {
   Type *ty = malloc(sizeof(Type));
@@ -48,7 +48,7 @@ static Type *ptr_of(Type *base) {
 }
 static Type *type() {
   if(!consume(TK_INT))
-    error_at(tokens[pos].input, "int expected");
+    error_at(tokens[pos].str, "int expected");
 
   Type *ty = &int_ty;
   while(consume('*'))
@@ -69,7 +69,7 @@ Node *param() {
   node->ty = type();
 
   if( tokens[pos].kind != TK_IDENT )
-    error_at(tokens[pos].input, "型の後には変数名が必要です");
+    error_at(tokens[pos].str, "型の後には変数名が必要です");
   node->name = tokens[pos++].name;
 
   return node;
@@ -82,7 +82,7 @@ Node *function() {
   expect(TK_INT);
 
   if (tokens[pos].kind != TK_IDENT) {
-    error_at(tokens[pos].input, "function name expected");
+    error_at(tokens[pos].str, "function name expected");
   }
   node->name = tokens[pos++].name;
 
@@ -203,7 +203,7 @@ Node *decl() {
   node->ty = type();
 
   if( tokens[pos].kind != TK_IDENT )
-    error_at(tokens[pos].input, "型の後には変数名が必要です");
+    error_at(tokens[pos].str, "型の後には変数名が必要です");
   node->name = tokens[pos++].name;
 
   expect(';');
@@ -319,5 +319,5 @@ Node *term() {
     return node;
   }
 
-  error_at(tokens[pos].input, "数値でも識別子でもないトークンです");
+  error_at(tokens[pos].str, "数値でも識別子でもないトークンです");
 }

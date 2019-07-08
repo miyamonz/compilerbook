@@ -97,6 +97,8 @@ LVar *find_lvar(Token *tok) {
 void program() {
   int i = 0;
   while(token->kind != TK_EOF) {
+    locals = calloc(1, sizeof(LVar));
+    locals->offset = 0;
     funcs[i++] = function();
   }
   funcs[i] = NULL;

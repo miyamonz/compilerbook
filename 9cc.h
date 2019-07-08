@@ -39,7 +39,7 @@ int is_alpha(char c);
 int is_digit(char c);
 int is_alnum(char c);
 // token
-enum {
+typedef enum {
   TK_NUM = 256,
   TK_IDENT,
   TK_INT,
@@ -53,12 +53,12 @@ enum {
   TK_LE, // <=
   TK_GE, // >=
   TK_EOF,
-};
+} TokenKind;
 
 typedef struct {
-  int ty;
+  TokenKind kind;
   int val;
-  char *name; // ty == TK_IDENTのとき、変数名
+  char *name; // kind == TK_IDENTのとき、変数名
   char *input;
 } Token;
 

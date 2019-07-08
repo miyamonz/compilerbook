@@ -20,28 +20,28 @@ void tokenize() {
     }
 
     if (strncmp(p, "==", 2) == 0) {
-      tokens[i].ty = TK_EQ;
+      tokens[i].kind = TK_EQ;
       tokens[i].input = p;
       i++;
       p += 2;
       continue;
     }
     if (strncmp(p, "!=", 2) == 0) {
-      tokens[i].ty = TK_NE;
+      tokens[i].kind = TK_NE;
       tokens[i].input = p;
       i++;
       p += 2;
       continue;
     }
     if (strncmp(p, "<=", 2) == 0) {
-      tokens[i].ty = TK_LE;
+      tokens[i].kind = TK_LE;
       tokens[i].input = p;
       i++;
       p += 2;
       continue;
     }
     if (strncmp(p, ">=", 2) == 0) {
-      tokens[i].ty = TK_GE;
+      tokens[i].kind = TK_GE;
       tokens[i].input = p;
       i++;
       p += 2;
@@ -53,10 +53,10 @@ void tokenize() {
       while(is_alnum(p[len]))
         len++;
       char *name = strndup(p, (size_t)len);
-      int ty = (intptr_t) map_get(keywords, name);
-      if(!ty)
-        ty = TK_IDENT;
-      tokens[i].ty = ty;
+      int kind = (intptr_t) map_get(keywords, name);
+      if(!kind)
+        kind = TK_IDENT;
+      tokens[i].kind = kind;
       tokens[i].input = p;
       tokens[i].name = name;
       i++;
@@ -66,7 +66,7 @@ void tokenize() {
 
 
     if (strchr("+-*/()<>;={},&", *p)) {
-      tokens[i].ty = *p;
+      tokens[i].kind = *p;
       tokens[i].input = p;
       i++;
       p++;
@@ -74,7 +74,7 @@ void tokenize() {
     }
 
     if (isdigit(*p)) {
-      tokens[i].ty = TK_NUM;
+      tokens[i].kind = TK_NUM;
       tokens[i].input = p;
       tokens[i].val = strtol(p, &p, 10);
       i++;
@@ -84,7 +84,7 @@ void tokenize() {
     error_at(p, "トークナイズできません");
   }
 
-  tokens[i].ty = TK_EOF;
+  tokens[i].kind = TK_EOF;
   tokens[i].input = p;
 
 }

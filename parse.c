@@ -28,7 +28,7 @@ Node *new_node_addr() {
 
 int pos = 0;
 int consume(int ty) {
-  if (tokens[pos].ty != ty)
+  if (tokens[pos].kind != ty)
     return 0;
   pos++;
   return 1;
@@ -58,7 +58,7 @@ static Type *type() {
 
 void program() {
   int i = 0;
-  while(tokens[pos].ty != TK_EOF)
+  while(tokens[pos].kind != TK_EOF)
     funcs[i++] = function();
   funcs[i] = NULL;
 }
@@ -68,7 +68,7 @@ Node *param() {
   node->op = ND_VARDEF;
   node->ty = type();
 
-  if( tokens[pos].ty != TK_IDENT )
+  if( tokens[pos].kind != TK_IDENT )
     error_at(tokens[pos].input, "型の後には変数名が必要です");
   node->name = tokens[pos++].name;
 
@@ -81,7 +81,7 @@ Node *function() {
 
   expect(TK_INT);
 
-  if (tokens[pos].ty != TK_IDENT) {
+  if (tokens[pos].kind != TK_IDENT) {
     error_at(tokens[pos].input, "function name expected");
   }
   node->name = tokens[pos++].name;
@@ -111,7 +111,7 @@ Node *compound_stmt() {
 Node *stmt() {
   Node *node;
 
-  if(tokens[pos].ty == TK_INT)
+  if(tokens[pos].kind == TK_INT)
     return decl();
 
   if(consume(TK_IF)) {
@@ -143,7 +143,7 @@ Node *stmt() {
     expect('(');
 
     // init
-    if( tokens[pos].ty == ';' ) {
+    if( tokens[pos].kind == ';' ) {
       node->init = NULL;
       consume(';');
     } else {
@@ -152,7 +152,7 @@ Node *stmt() {
     }
 
     // cond
-    if( tokens[pos].ty == ';' ) {
+    if( tokens[pos].kind == ';' ) {
       node->cond = NULL;
       consume(';');
     } else {
@@ -161,7 +161,7 @@ Node *stmt() {
     }
 
     // inc
-    if( tokens[pos].ty == ')' ) {
+    if( tokens[pos].kind == ')' ) {
       node->inc = NULL;
       consume(')');
     } else {
@@ -202,7 +202,7 @@ Node *decl() {
   node->op = ND_VARDEF;
   node->ty = type();
 
-  if( tokens[pos].ty != TK_IDENT )
+  if( tokens[pos].kind != TK_IDENT )
     error_at(tokens[pos].input, "型の後には変数名が必要です");
   node->name = tokens[pos++].name;
 
@@ -293,10 +293,10 @@ Node *term() {
     return node;
   }
 
-  if (tokens[pos].ty == TK_NUM)
+  if (tokens[pos].kind == TK_NUM)
     return new_node_num(tokens[pos++].val);
 
-  if (tokens[pos].ty == TK_IDENT) {
+  if (tokens[pos].kind == TK_IDENT) {
     Node *node = malloc(sizeof(Node));
     node->name = tokens[pos++].name;
 

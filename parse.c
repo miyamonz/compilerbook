@@ -93,6 +93,17 @@ LVar *find_lvar(Token *tok) {
   }
   return NULL;
 }
+LVar *put_lvar(Token *tok) {
+  LVar *lvar = calloc(1, sizeof(LVar));
+  lvar->next = locals;
+
+  lvar->name = tok->str;
+  lvar->len = tok->len;
+  lvar->offset = locals->offset + 8;
+
+  locals = lvar;
+  return lvar;
+}
 
 void program() {
   int i = 0;
@@ -241,13 +252,8 @@ Node *decl() {
     error_at(token->str, "variable %s is already defined.", tok->name);
 
   // create new variable
-  lvar = calloc(1, sizeof(LVar));
-  lvar->next = locals;
-  lvar->name = tok->str;
-  lvar->len = tok->len;
-  lvar->offset = locals->offset + 8;
+  lvar = put_lvar(tok);
   node->offset = lvar->offset;
-  locals = lvar;
 
   return node;
 }

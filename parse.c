@@ -245,7 +245,7 @@ Node *decl() {
   lvar->next = locals;
   lvar->name = tok->str;
   lvar->len = tok->len;
-  lvar->offset = locals == NULL ? 0 : locals->offset + 8;
+  lvar->offset = locals->offset + 8;
   node->offset = lvar->offset;
   locals = lvar;
 

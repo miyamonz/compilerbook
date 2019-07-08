@@ -8,45 +8,15 @@ typedef struct {
   int offset;
 } Var;
 
-int isPtr(Node *node) {
-  if (node->op != ND_IDENT) return 0;
-  Var *var = (Var *)map_get(vars,node->name);
-  return var->ty->ty == PTR;
-}
-int size_of(Type *ty) {
-  if (ty->ty == INT)
-    return 4;
-  assert(ty->ty == PTR);
-  return 8;
-}
-
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
-
-Var *gen_vardef(Node *node) {
-  if (node->op != ND_VARDEF)
-    error("変数宣言ではありません");
-
-  if(map_get(vars, node->name))
-    error("%s is already defined.", node->name);
-
-  bpoff += 8;
-  Var *var = malloc(sizeof(Var));
-  var->ty = node->ty;
-  var->offset = bpoff;
-  map_put(vars, node->name, (void *)var);
-  return var;
-}
 
 //gen_lval pushes pointer to variable
 void gen_lval(Node *node) {
   if (node->op == ND_IDENT) {
-    if(!map_get(vars, node->name))
-      error("variable %s is not defined yet.", node->name);
 
-    Var *var = (Var *)map_get(vars,node->name);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", var->offset);
+    printf("  sub rax, %d\n", node->offset);
     printf("  push rax\n");
     return;
   }
@@ -73,7 +43,6 @@ void gen(Node *node) {
   }
 
   if (node->op == ND_VARDEF) {
-    gen_vardef(node);
     return;
   }
 
@@ -196,9 +165,8 @@ void gen(Node *node) {
     return;
   }
   if (node->op == ND_ADDR) {
-    Var *var = (Var *)map_get(vars,node->lhs->name);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", var->offset);
+    printf("  sub rax, %d\n", node->offset);
     printf("  push rax\n");
     return;
   }
@@ -209,42 +177,10 @@ void gen(Node *node) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  Type *ltype = node->lhs->ty;
-  Type *rtype = node->rhs->ty;
-  int lIsPtr = isPtr(node->lhs);
-  int rIsPtr = isPtr(node->rhs);
-
   node->ty = &int_ty;
   switch (node->op) {
     case '+':
-      if(lIsPtr && rIsPtr)
-        error(" pointer + pointer is invalid");
     case '-':
-      if(lIsPtr && !rIsPtr) {
-        printf("  push rax\n"); // push lhs
-
-        //rhs * size
-        printf("  mov rax, rdi\n");
-        printf("  push %d\n", size_of(rtype));
-        printf("  pop rdi\n");
-        printf("  imul rdi\n");
-        printf("  mov rdi, rax\n");
-        node->ty = rtype;
-
-        printf("  pop rax\n"); // pop lhs
-      }
-      if(!lIsPtr && rIsPtr) {
-        printf("  push rdi\n"); // push rhs
-
-        //lhs * size
-        printf("  push %d\n", size_of(ltype));
-        printf("  pop rdi\n");
-        printf("  imul rdi\n");
-
-        printf("  pop rdi\n"); // pop rhs
-        node->ty = ltype;
-      }
-
       printf("  %s rax, rdi\n", node->op == '+' ? "add" : "sub");
       break;
     case '*':
@@ -295,9 +231,8 @@ void gen_func(Node *node) {
     Node *param = (Node *)node->args->data[i];
     if(!param) break;
 
-    Var *var = gen_vardef(param);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", var->offset);
+    printf("  sub rax, %d\n", param->offset);
     printf("  push rax\n");
 
     printf("  pop rax\n");

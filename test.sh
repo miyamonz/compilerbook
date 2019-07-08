@@ -135,6 +135,7 @@ try 0 'int main() { int *x; return 0; }'
 try 0 'int main() { int **x; return 0; }'
 try 0 'int main() { int ***x; return 0; }'
 
+<< COMMENTOUT
 try 42 'int main() { int *p; p = alloc(42); return *p; }'
 
 try 42 'int main() { int *p; p = alloc(0); *p = 42; return *p; }'
@@ -146,6 +147,7 @@ try 8 'int main() { int *p; p = alloc1(3,5); return *p + *(1+p); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(p-1); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(-1+p); }'
 try 2 'int main() { int **p; p = alloc_ptr_ptr(2); return **p; }'
+COMMENTOUT
 
 # I found error when same name variable in each functions
 try 103 'int add3( int x ) { int a; a = 3; return x + a; } int main() {int a; a = 100; return add3(a); }'

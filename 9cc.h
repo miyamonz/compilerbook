@@ -38,6 +38,7 @@ struct LVar {
   char *name;
   int len;
   int offset;
+  Type *ty;
 };
 LVar *locals;
 

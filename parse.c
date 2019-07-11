@@ -16,11 +16,12 @@ Node *term();
 
 static Type int_ty = {INT, NULL};
 
-Node *new_node(int op, Node *lhs, Node *rhs) {
+Node *new_node(int op, Node *lhs, Node *rhs, Type *ty) {
   Node *node = malloc(sizeof(Node));
   node->op = op;
   node->lhs = lhs;
   node->rhs = rhs;
+  node->ty = ty;
   return node;
 }
 
@@ -32,11 +33,13 @@ Node *new_node_num(int val) {
   return node;
 }
 Node *new_node_deref() {
-  return new_node(ND_DEREF, mul(), NULL);
+  Node *m = mul();
+  return new_node(ND_DEREF, m, NULL, m->ty->ptrof);
 }
 static Type *ptr_of(Type *base);
 Node *new_node_addr() {
-  return new_node(ND_ADDR, mul(), NULL);
+  Node *m = mul();
+  return new_node(ND_ADDR, m, NULL, ptr_of(m->ty));
 }
 
 // util
@@ -93,13 +96,14 @@ LVar *find_lvar(Token *tok) {
   }
   return NULL;
 }
-LVar *put_lvar(Token *tok) {
+LVar *put_lvar(Token *tok, Type* ty) {
   LVar *lvar = calloc(1, sizeof(LVar));
   lvar->next = locals;
 
   lvar->name = tok->str;
   lvar->len = tok->len;
   lvar->offset = locals->offset + 8;
+  lvar->ty = ty;
 
   locals = lvar;
   return lvar;
@@ -252,7 +256,7 @@ Node *decl() {
     error_at(token->str, "variable %s is already defined.", tok->name);
 
   // create new variable
-  lvar = put_lvar(tok);
+  lvar = put_lvar(tok, node->ty);
   node->offset = lvar->offset;
 
   return node;
@@ -265,7 +269,7 @@ Node *expr() {
 Node *assign() {
   Node *node = equality();
   if(consume('='))
-    return new_node('=', node, assign());
+    return new_node('=', node, assign(), &int_ty);
   return node;
 
 }
@@ -274,9 +278,9 @@ Node *equality() {
   Node *node = relational();
   for (;;) {
     if (consume(TK_EQ))
-      node = new_node(ND_EQ, node, relational());
+      node = new_node(ND_EQ, node, relational(), &int_ty);
     else if (consume(TK_NE))
-      node = new_node(ND_NE, node, relational());
+      node = new_node(ND_NE, node, relational(), &int_ty);
     else
       return node;
   }
@@ -286,13 +290,13 @@ Node *relational() {
   Node *node = add();
   for (;;) {
     if (consume(TK_LE))
-      node = new_node(ND_LE, node, add());
+      node = new_node(ND_LE, node, add(), &int_ty);
     else if (consume(TK_GE))
-      node = new_node(ND_LE, add(), node);
+      node = new_node(ND_LE, add(), node, &int_ty);
     else if (consume('<'))
-      node = new_node('<', node, add());
+      node = new_node('<', node, add(), &int_ty);
     else if (consume('>'))
-      node = new_node('<', add(), node);
+      node = new_node('<', add(), node, &int_ty);
     else
       return node;
   }
@@ -301,10 +305,11 @@ Node *add() {
   Node *node = mul(); 
 
   for (;;) {
+    // TODO: check pointer and change type
     if (consume('+'))
-      node = new_node('+', node, mul());
+      node = new_node('+', node, mul(), &int_ty);
     else if (consume('-'))
-      node = new_node('-', node, mul());
+      node = new_node('-', node, mul(), &int_ty);
     else
       return node;
   }
@@ -315,9 +320,9 @@ Node *mul() {
 
   for (;;) {
     if (consume('*'))
-      node = new_node('*', node, unary());
+      node = new_node('*', node, unary(), node->ty);
     else if (consume('/'))
-      node = new_node('/', node, unary());
+      node = new_node('/', node, unary(), node->ty);
     else
       return node;
   }
@@ -327,7 +332,7 @@ Node *unary() {
   if(consume('+'))
     return term();
   if(consume('-'))
-    return new_node('-', new_node_num(0), term());
+    return new_node('-', new_node_num(0), term(), &int_ty);
   if(consume('*'))
     return new_node_deref();
   if(consume('&'))

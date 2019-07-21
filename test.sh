@@ -149,7 +149,6 @@ try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(p-1); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(-1+p); }'
 try 2 'int main() { int **p; p = alloc_ptr_ptr(2); return **p; }'
 
-# I found error when same name variable in each functions
 try 103 'int add3( int x ) { int a; a = 3; return x + a; } int main() {int a; a = 100; return add3(a); }'
 
 echo OK

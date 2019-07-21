@@ -7,3 +7,7 @@ services:
     volumes:
       - ./:/9cc
     working_dir: /9cc
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined

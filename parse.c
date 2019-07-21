@@ -149,6 +149,8 @@ Node *function() {
   expect('{');
   node->body = compound_stmt();
 
+  node->locals = locals;
+
   return node;
 }
 

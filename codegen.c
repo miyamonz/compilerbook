@@ -1,11 +1,6 @@
 #include "9cc.h"
 #include "assert.h"
 
-typedef struct {
-  Type *ty;
-  int offset;
-} Var;
-
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
 
@@ -227,10 +222,16 @@ void gen_func(Node *node) {
 
   printf("%s:\n", node->name);
 
+  int off = 0;
+  for(LVar *var = node->locals; var; var = var->next) {
+    off += 8;
+  }
+  printf("# off %d\n", off);
+
   //プロローグ
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, %d\n", (off / 16 + 2) * 16 ); // 16でalign, 変数がn個ならn+1だけrspはずらす？
 
   // 変数代入と同様のコードを作り、値はABIに基づいて代入する
   for(int i=0; i<len; i++) {

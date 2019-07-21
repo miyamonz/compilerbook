@@ -181,7 +181,7 @@ void gen(Node *node) {
       if(node->ty->ty == PTR) {
         printf("####### pointer\n");
         //rhs * size
-        printf("  push %d\n", (node->ty->ptrof->ty == PTR) ? 8 : 4); //pointer size
+        printf("  push %d\n", (node->ty->ptr_to->ty == PTR) ? 8 : 4); //pointer size
         printf("  pop rsi\n");
         printf("  imul rdi, rsi\n");
 

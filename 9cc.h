@@ -9,7 +9,7 @@
 // type
 typedef struct Type {
   enum { INT, PTR } ty;
-  struct Type *ptrof;
+  struct Type *ptr_to;
 } Type;
 
 // util.c

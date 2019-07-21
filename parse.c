@@ -34,7 +34,7 @@ Node *new_node_num(int val) {
 }
 Node *new_node_deref() {
   Node *m = mul();
-  return new_node(ND_DEREF, m, NULL, m->ty->ptrof);
+  return new_node(ND_DEREF, m, NULL, m->ty->ptr_to);
 }
 
 static Type *ptr_of(Type *base);
@@ -85,7 +85,7 @@ static int expect_number() {
 static Type *ptr_of(Type *base) {
   Type *ty = malloc(sizeof(Type));
   ty->ty = PTR;
-  ty->ptrof = base;
+  ty->ptr_to = base;
   return ty;
 }
 static Type *type() {

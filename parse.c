@@ -36,10 +36,20 @@ Node *new_node_deref() {
   Node *m = mul();
   return new_node(ND_DEREF, m, NULL, m->ty->ptrof);
 }
+
 static Type *ptr_of(Type *base);
+Token *consume_ident();
+LVar *find_lvar(Token *tok);
 Node *new_node_addr() {
-  Node *m = mul();
-  return new_node(ND_ADDR, m, NULL, ptr_of(m->ty));
+  Token *tok = consume_ident();
+  LVar *lvar = find_lvar(tok);
+  if(lvar == NULL)
+    error_at(tok->str, "variable is not defined");
+
+  Node *node = new_node(ND_ADDR, NULL, NULL, ptr_of(lvar->ty));
+  node->name = lvar->name;
+  node->offset = lvar->offset;
+  return node;
 }
 
 // util
@@ -100,7 +110,7 @@ LVar *put_lvar(Token *tok, Type* ty) {
   LVar *lvar = calloc(1, sizeof(LVar));
   lvar->next = locals;
 
-  lvar->name = tok->str;
+  lvar->name = tok->name;
   lvar->len = tok->len;
   lvar->offset = locals->offset + 8;
   lvar->ty = ty;
@@ -301,17 +311,33 @@ Node *relational() {
       return node;
   }
 }
+
+void swap(Node **p, Node ** q) {
+  Node *r = *p;
+  *p = *q;
+  *q = r;
+}
 Node *add() {
   Node *node = mul(); 
 
   for (;;) {
     // TODO: check pointer and change type
-    if (consume('+'))
-      node = new_node('+', node, mul(), &int_ty);
-    else if (consume('-'))
-      node = new_node('-', node, mul(), &int_ty);
-    else
+    if (consume('+')) {
+      Node *rhs = mul();
+      if(node->ty->ty == PTR && rhs->ty->ty == PTR)
+        error_at(token->str, "pointer + pointer is invalid.");
+      if(rhs->ty->ty == PTR) swap(&rhs, &node);
+      node = new_node('+', node, rhs, node->ty);
+    } else if (consume('-')) {
+      Node *rhs = mul();
+      if(node->ty->ty == PTR && rhs->ty->ty == PTR)
+        error_at(token->str, "pointer - pointer is invalid.");
+      if(rhs->ty->ty == PTR) swap(&rhs, &node);
+
+      node = new_node('-', node, rhs, node->ty);
+    } else {
       return node;
+    }
   }
 }
 
@@ -363,12 +389,15 @@ Node *term() {
         error_at(token->str, "variable not defined yet.");
 
       node->offset = lvar->offset;
+      node->ty = lvar->ty;
+      node->name = lvar->name;
       return node;
     }
 
     // function call
     node->op = ND_CALL;
     node->args = new_vector();
+    node->ty = &int_ty; // currently only support return int
     if(consume(')'))
       return node;
 

@@ -1,8 +1,6 @@
 #include "9cc.h"
 #include "assert.h"
 
-static Type int_ty = {INT, NULL};
-
 typedef struct {
   Type *ty;
   int offset;
@@ -177,10 +175,18 @@ void gen(Node *node) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  node->ty = &int_ty;
   switch (node->op) {
     case '+':
     case '-':
+      if(node->ty->ty == PTR) {
+        printf("####### pointer\n");
+        //rhs * size
+        printf("  push %d\n", 8); //pointer size
+        printf("  pop rsi\n");
+        printf("  imul rdi, rsi\n");
+
+        printf("####### end pointer\n");
+      }
       printf("  %s rax, rdi\n", node->op == '+' ? "add" : "sub");
       break;
     case '*':

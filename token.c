@@ -17,6 +17,7 @@ Token *tokenize(char *p) {
   map_put(keywords, "while", (void *) TK_WHILE);
   map_put(keywords, "for", (void *) TK_FOR);
   map_put(keywords, "int", (void *) TK_INT);
+  map_put(keywords, "sizeof", (void *) TK_SIZEOF);
 
   Token head;
   head.next = NULL;

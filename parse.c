@@ -355,6 +355,11 @@ Node *mul() {
 }
 
 Node *unary() {
+  if(consume(TK_SIZEOF)) {
+    Node *n = unary();
+    return new_node_num(n->ty->ty == PTR ? 8 : 4);
+  }
+
   if(consume('+'))
     return term();
   if(consume('-'))

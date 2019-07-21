@@ -151,4 +151,9 @@ try 2 'int main() { int **p; p = alloc_ptr_ptr(2); return **p; }'
 
 try 103 'int add3( int x ) { int a; a = 3; return x + a; } int main() {int a; a = 100; return add3(a); }'
 
+try 4 'int main() { return sizeof 1; }'
+try 8 'int main() { int *p; return sizeof(p); }'
+try 8 'int main() { int *p; return sizeof(p+1); }'
+try 4 'int main() { int *p; return sizeof(*p); }'
+
 echo OK

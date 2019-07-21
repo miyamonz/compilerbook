@@ -53,6 +53,7 @@ typedef enum {
   TK_NUM = 256,
   TK_IDENT,
   TK_INT,
+  TK_SIZEOF,
   TK_RETURN,
   TK_IF,
   TK_ELSE,

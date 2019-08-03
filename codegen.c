@@ -173,7 +173,7 @@ void gen(Node *node) {
   switch (node->op) {
     case '+':
     case '-':
-      if(node->ty->ty == PTR) {
+      if(node->ty->ty == PTR || node->ty->ty == ARRAY) {
         printf("####### pointer\n");
         //rhs * size
         printf("  push %d\n", (node->ty->ptr_to->ty == PTR) ? 8 : 4); //pointer size
@@ -222,16 +222,29 @@ void gen_func(Node *node) {
 
   printf("%s:\n", node->name);
 
-  int off = 0;
+  // rbpから8offsetしてスタート
+  int off = 8;
+  printf("# local variables\n");
   for(LVar *var = node->locals; var; var = var->next) {
-    off += 8;
+    var->offset = off;
+    printf("# var->name: %s, offset:%d \n", var->name, off);
+    switch (var->ty->ty) {
+      case INT:
+        off += 8;
+        break;
+      case PTR:
+        off += 8;
+        break;
+      case ARRAY:
+        off += 8 * var->ty->array_size;
+        break;
+    }
   }
-  printf("# off %d\n", off);
 
   //プロローグ
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, %d\n", (off / 16 + 2) * 16 ); // 16でalign, 変数がn個ならn+1だけrspはずらす？
+  printf("  sub rsp, %d\n", (off / 16 + 1) * 16 ); // 16でalign
 
   // 変数代入と同様のコードを作り、値はABIに基づいて代入する
   for(int i=0; i<len; i++) {

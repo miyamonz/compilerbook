@@ -112,7 +112,7 @@ LVar *put_lvar(Token *tok, Type* ty) {
 
   lvar->name = tok->name;
   lvar->len = tok->len;
-  lvar->offset = locals->offset + 8;
+  lvar->offset = (locals ? locals->offset : 0) + 8;
   lvar->ty = ty;
 
   locals = lvar;
@@ -122,14 +122,13 @@ LVar *put_lvar(Token *tok, Type* ty) {
 void program() {
   int i = 0;
   while(token->kind != TK_EOF) {
-    locals = calloc(1, sizeof(LVar));
-    locals->offset = 0;
     funcs[i++] = function();
   }
   funcs[i] = NULL;
 }
 
 Node *function() {
+  locals = NULL;
   Node *node = malloc(sizeof(Node));
   node->op = ND_FUNC;
   node->args = new_vector();

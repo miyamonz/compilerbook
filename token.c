@@ -71,7 +71,7 @@ Token *tokenize(char *p) {
     }
 
 
-    if (strchr("+-*/()<>;={},&", *p)) {
+    if (strchr("+-*/()<>;={},&[]", *p)) {
       cur = new_token(*p, cur, p);
       cur->len = 1;
       p++;

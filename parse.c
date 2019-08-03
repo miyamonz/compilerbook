@@ -88,6 +88,14 @@ static Type *ptr_of(Type *base) {
   ty->ptr_to = base;
   return ty;
 }
+static Type *array_of(Type *base, int size) {
+  Type *ty = malloc(sizeof(Type));
+  ty->ty = ARRAY;
+  ty->ptr_to = base;
+  ty->array_size = size;
+  return ty;
+}
+
 static Type *type() {
   if(!consume(TK_INT))
     error_at(token->str, "int expected");
@@ -266,6 +274,12 @@ Node *decl() {
 
   if (find_lvar(tok))
     error_at(token->str, "variable %s is already defined.", tok->name);
+
+  if(consume('[')) {
+    int num = expect_number();
+    ty = array_of(ty, num);
+    expect(']');
+  }
 
   node->ty = ty;
   // create new variable

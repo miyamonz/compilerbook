@@ -156,4 +156,5 @@ try 8 'int main() { int *p; return sizeof(p); }'
 try 8 'int main() { int *p; return sizeof(p+1); }'
 try 4 'int main() { int *p; return sizeof(*p); }'
 
+try 3 'int main() { int a[2]; *a = 1; *(a+1) = 2; int *p; p = a; return *p + *(p+1); }'
 echo OK

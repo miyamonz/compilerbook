@@ -248,6 +248,7 @@ void gen_func(Node *node) {
 
   int i=0;
   while(node->body->stmts[i]) {
+    printf("\n# %s stmt %d %s\n", node->name, i, node->body->stmts[i]->str);
     gen(node->body->stmts[i]);
     i++;
     // 式の評価結果がスタックに一つの値が残っている

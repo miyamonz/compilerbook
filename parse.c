@@ -171,17 +171,19 @@ Node *compound_stmt() {
   return node;
 }
 Node *stmt() {
-  Node *node;
+  Node *node = malloc(sizeof(Node));
+  char *pos = token->str;
+  node->str = pos;
 
   if(token->kind == TK_INT) {
     Node *d = decl();
+    d->str = pos;
     expect(';');
     return d;
   }
 
   if(consume(TK_IF)) {
     expect('(');
-    node = malloc(sizeof(Node));
     node->op = ND_IF;
     node->cond = expr();
     expect(')');
@@ -193,7 +195,6 @@ Node *stmt() {
 
   if(consume(TK_WHILE)) {
     expect('(');
-    node = malloc(sizeof(Node));
     node->op = ND_WHILE;
     node->cond = expr();
     expect(')');
@@ -202,7 +203,6 @@ Node *stmt() {
   }
 
   if(consume(TK_FOR)) {
-    node = malloc(sizeof(Node));
     node->op = ND_FOR;
 
     expect('(');
@@ -239,7 +239,6 @@ Node *stmt() {
   }
 
   if (consume('{')) {
-    node = malloc(sizeof(Node));
     node->op = ND_BLOCK;
 
     int i=0;
@@ -250,11 +249,11 @@ Node *stmt() {
   }
 
   if (consume(TK_RETURN)) {
-    node = malloc(sizeof(Node));
     node->op = ND_RETURN;
     node->lhs = expr();
   } else {
     node = expr();
+    node->str = pos;
   }
 
   expect(';');

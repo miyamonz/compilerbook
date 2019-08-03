@@ -132,6 +132,9 @@ typedef struct Node {
   // function call
   Vector *args;
   LVar *locals;
+
+  //debug
+  char *str;
 } Node;
 
 Node *funcs[100];

@@ -259,17 +259,18 @@ Node *stmt() {
 Node *decl() {
   Node *node = malloc(sizeof(Node));
   node->op = ND_VARDEF;
-  node->ty = type();
+
+  Type *ty = type();
 
   Token *tok = consume_ident();
   node->name = tok->name;
 
-  LVar *lvar = find_lvar(tok);
-  if (lvar)
+  if (find_lvar(tok))
     error_at(token->str, "variable %s is already defined.", tok->name);
 
+  node->ty = ty;
   // create new variable
-  lvar = put_lvar(tok, node->ty);
+  LVar *lvar = put_lvar(tok, ty);
   node->offset = lvar->offset;
 
   return node;

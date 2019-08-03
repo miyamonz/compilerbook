@@ -255,6 +255,7 @@ Node *stmt() {
   return node;
 }
 
+// int hoge など。関数の引数でも利用するため;は含まない
 Node *decl() {
   Node *node = malloc(sizeof(Node));
   node->op = ND_VARDEF;

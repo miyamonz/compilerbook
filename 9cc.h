@@ -108,9 +108,11 @@ typedef struct Node {
   struct Node *rhs;
   int val;
 
-  // ND_IDENT, ND_CALL, ND_FUNC
+  // ND_CALL, ND_FUNC
   char *name;
-  int offset;
+
+  // ND_IDENT, ND_VARDEF, ND_ADDR
+  LVar *var;
 
   Type *ty;
 

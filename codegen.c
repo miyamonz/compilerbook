@@ -9,7 +9,7 @@ void gen_lval(Node *node) {
   if (node->op == ND_IDENT) {
 
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", node->offset);
+    printf("  sub rax, %d\n", node->var->offset);
     printf("  push rax\n");
     return;
   }
@@ -159,7 +159,7 @@ void gen(Node *node) {
   }
   if (node->op == ND_ADDR) {
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", node->offset);
+    printf("  sub rax, %d\n", node->var->offset);
     printf("  push rax\n");
     return;
   }
@@ -239,7 +239,7 @@ void gen_func(Node *node) {
     if(!param) break;
 
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", param->offset);
+    printf("  sub rax, %d\n", param->var->offset);
     printf("  push rax\n");
 
     printf("  pop rax\n");

@@ -47,8 +47,7 @@ Node *new_node_addr() {
     error_at(tok->str, "variable is not defined");
 
   Node *node = new_node(ND_ADDR, NULL, NULL, ptr_of(lvar->ty));
-  node->name = lvar->name;
-  node->offset = lvar->offset;
+  node->var = lvar;
   return node;
 }
 
@@ -269,7 +268,6 @@ Node *decl() {
   Type *ty = type();
 
   Token *tok = consume_ident();
-  node->name = tok->name;
 
   if (find_lvar(tok))
     error_at(token->str, "variable %s is already defined.", tok->name);
@@ -283,7 +281,7 @@ Node *decl() {
   node->ty = ty;
   // create new variable
   LVar *lvar = put_lvar(tok, ty);
-  node->offset = lvar->offset;
+  node->var = lvar;
 
   return node;
 }
@@ -399,7 +397,6 @@ Node *term() {
   if (token->kind == TK_IDENT) {
     Node *node = malloc(sizeof(Node));
     Token *tok = consume_ident();
-    node->name = tok->name;
 
     // identifier
     if(!consume('(')) {
@@ -408,15 +405,14 @@ Node *term() {
       LVar *lvar = find_lvar(tok);
       if (lvar == NULL)
         error_at(token->str, "variable not defined yet.");
-
-      node->offset = lvar->offset;
+      node->var = lvar;
       node->ty = lvar->ty;
-      node->name = lvar->name;
       return node;
     }
 
     // function call
     node->op = ND_CALL;
+    node->name = tok->name;
     node->args = new_vector();
     node->ty = &int_ty; // currently only support return int
     if(consume(')'))

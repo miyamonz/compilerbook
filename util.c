@@ -11,11 +11,19 @@ noreturn void error(char *fmt, ...) {
 }
 
 // エラー箇所を報告するための関数
-noreturn void error_at(char *loc, char *msg) {
+noreturn void error_at(char *loc, char *msg, ...) {
+  va_list ap;
+  va_start(ap, msg);
+
   int pos = loc - user_input;
   fprintf(stderr, "%s\n", user_input);
   fprintf(stderr, "%*s", pos, ""); // pos個の空白を出力
-  fprintf(stderr, "^ %s\n", msg);
+  fprintf(stderr, "^ ");
+  vfprintf(stderr, msg, ap);
+  fprintf(stderr, "\n");
+  fprintf(stderr, "--- defined variables\n");
+  for(LVar *var = locals; var; var = var->next)
+    fprintf(stderr, "- %.*s\n", var->len, var->name);
   exit(1);
 }
 

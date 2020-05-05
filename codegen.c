@@ -1,52 +1,15 @@
 #include "9cc.h"
 #include "assert.h"
 
-static Type int_ty = {INT, NULL};
-
-typedef struct {
-  Type *ty;
-  int offset;
-} Var;
-
-int isPtr(Node *node) {
-  if (node->op != ND_IDENT) return 0;
-  Var *var = (Var *)map_get(vars,node->name);
-  return var->ty->ty == PTR;
-}
-int size_of(Type *ty) {
-  if (ty->ty == INT)
-    return 4;
-  assert(ty->ty == PTR);
-  return 8;
-}
-
 char *arg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 int len = sizeof(arg)/sizeof(*arg);
-
-Var *gen_vardef(Node *node) {
-  if (node->op != ND_VARDEF)
-    error("変数宣言ではありません");
-
-  if(map_get(vars, node->name))
-    error("%s is already defined.", node->name);
-
-  bpoff += 8;
-  Var *var = malloc(sizeof(Var));
-  var->ty = node->ty;
-  var->offset = bpoff;
-  map_put(vars, node->name, (void *)var);
-  return var;
-}
 
 //gen_lval pushes pointer to variable
 void gen_lval(Node *node) {
   if (node->op == ND_IDENT) {
-    if(!map_get(vars, node->name))
-      error("variable %s is not defined yet.", node->name);
 
-    Var *var = (Var *)map_get(vars,node->name);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", var->offset);
+    printf("  sub rax, %d\n", node->var->offset);
     printf("  push rax\n");
     return;
   }
@@ -73,7 +36,6 @@ void gen(Node *node) {
   }
 
   if (node->op == ND_VARDEF) {
-    gen_vardef(node);
     return;
   }
 
@@ -196,9 +158,8 @@ void gen(Node *node) {
     return;
   }
   if (node->op == ND_ADDR) {
-    Var *var = (Var *)map_get(vars,node->lhs->name);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", var->offset);
+    printf("  sub rax, %d\n", node->var->offset);
     printf("  push rax\n");
     return;
   }
@@ -209,42 +170,18 @@ void gen(Node *node) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  Type *ltype = node->lhs->ty;
-  Type *rtype = node->rhs->ty;
-  int lIsPtr = isPtr(node->lhs);
-  int rIsPtr = isPtr(node->rhs);
-
-  node->ty = &int_ty;
   switch (node->op) {
     case '+':
-      if(lIsPtr && rIsPtr)
-        error(" pointer + pointer is invalid");
     case '-':
-      if(lIsPtr && !rIsPtr) {
-        printf("  push rax\n"); // push lhs
-
+      if(node->ty->ty == PTR || node->ty->ty == ARRAY) {
+        printf("####### pointer\n");
         //rhs * size
-        printf("  mov rax, rdi\n");
-        printf("  push %d\n", size_of(rtype));
-        printf("  pop rdi\n");
-        printf("  imul rdi\n");
-        printf("  mov rdi, rax\n");
-        node->ty = rtype;
+        printf("  push %d\n", (node->ty->ptr_to->ty == PTR) ? 8 : 4); //pointer size
+        printf("  pop rsi\n");
+        printf("  imul rdi, rsi\n");
 
-        printf("  pop rax\n"); // pop lhs
+        printf("####### end pointer\n");
       }
-      if(!lIsPtr && rIsPtr) {
-        printf("  push rdi\n"); // push rhs
-
-        //lhs * size
-        printf("  push %d\n", size_of(ltype));
-        printf("  pop rdi\n");
-        printf("  imul rdi\n");
-
-        printf("  pop rdi\n"); // pop rhs
-        node->ty = ltype;
-      }
-
       printf("  %s rax, rdi\n", node->op == '+' ? "add" : "sub");
       break;
     case '*':
@@ -285,19 +222,37 @@ void gen_func(Node *node) {
 
   printf("%s:\n", node->name);
 
+  // rbpから8offsetしてスタート
+  int off = 8;
+  printf("# local variables\n");
+  for(LVar *var = node->locals; var; var = var->next) {
+    var->offset = off;
+    printf("# var->name: %s, offset:%d \n", var->name, off);
+    switch (var->ty->ty) {
+      case INT:
+        off += 8;
+        break;
+      case PTR:
+        off += 8;
+        break;
+      case ARRAY:
+        off += 8 * var->ty->array_size;
+        break;
+    }
+  }
+
   //プロローグ
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, %d\n", (off / 16 + 1) * 16 ); // 16でalign
 
   // 変数代入と同様のコードを作り、値はABIに基づいて代入する
   for(int i=0; i<len; i++) {
     Node *param = (Node *)node->args->data[i];
     if(!param) break;
 
-    Var *var = gen_vardef(param);
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", var->offset);
+    printf("  sub rax, %d\n", param->var->offset);
     printf("  push rax\n");
 
     printf("  pop rax\n");
@@ -306,6 +261,7 @@ void gen_func(Node *node) {
 
   int i=0;
   while(node->body->stmts[i]) {
+    printf("\n# %s stmt %d %s\n", node->name, i, node->body->stmts[i]->str);
     gen(node->body->stmts[i]);
     i++;
     // 式の評価結果がスタックに一つの値が残っている

@@ -8,8 +8,9 @@
 
 // type
 typedef struct Type {
-  enum { INT, PTR } ty;
-  struct Type *ptrof;
+  enum { INT, PTR, ARRAY } ty;
+  struct Type *ptr_to;
+  size_t array_size;
 } Type;
 
 // util.c
@@ -32,17 +33,28 @@ void *map_get(Map *map, char *key);
 Map *vars;
 int bpoff;
 
+typedef struct LVar LVar;
+struct LVar {
+  LVar *next;
+  char *name;
+  int len;
+  int offset;
+  Type *ty;
+};
+LVar *locals;
+
 void runtest();
 noreturn void error(char *fmt, ...);
-noreturn void error_at(char *loc, char *msg);
+noreturn void error_at(char *loc, char *msg, ...);
 int is_alpha(char c);
 int is_digit(char c);
 int is_alnum(char c);
 // token
-enum {
+typedef enum {
   TK_NUM = 256,
   TK_IDENT,
   TK_INT,
+  TK_SIZEOF,
   TK_RETURN,
   TK_IF,
   TK_ELSE,
@@ -53,18 +65,22 @@ enum {
   TK_LE, // <=
   TK_GE, // >=
   TK_EOF,
+} TokenKind;
+
+typedef struct Token Token;
+struct Token {
+  TokenKind kind;
+  Token *next;
+  int val; // kind がTK_NUMのときの数値
+  char *name; // kind == TK_IDENTのとき、変数名
+  char *str; //トークン文字列
+  int len; //トークン長さ
 };
 
-typedef struct {
-  int ty;
-  int val;
-  char *name; // ty == TK_IDENTのとき、変数名
-  char *input;
-} Token;
-
 char *user_input;
-Token tokens[100];
-void tokenize();
+//現在着目しているトークン
+Token *token;
+Token *tokenize(char *);
 
 
 //node
@@ -92,8 +108,11 @@ typedef struct Node {
   struct Node *rhs;
   int val;
 
-  // ND_IDENT, ND_CALL, ND_FUNC
+  // ND_CALL, ND_FUNC
   char *name;
+
+  // ND_IDENT, ND_VARDEF, ND_ADDR
+  LVar *var;
 
   Type *ty;
 
@@ -114,22 +133,14 @@ typedef struct Node {
 
   // function call
   Vector *args;
+  LVar *locals;
+
+  //debug
+  char *str;
 } Node;
 
 Node *funcs[100];
 void program();
-Node *function();
-Node *compound_stmt();
-Node *stmt();
-Node *decl();
-Node *expr();
-Node *assign();
-Node *equality();
-Node *relational();
-Node *add();
-Node *mul();
-Node *unary();
-Node *term();
 
 void gen(Node *node);
 void gen_func(Node *node);

@@ -4,13 +4,15 @@ try() {
   input="$2"
 
   ./9cc "$input" > tmp.s
-  gcc -o tmp tmp.s tmp-*.o
+  gcc -g -O0 -o tmp tmp.s tmp-*.o
   ./tmp
   actual="$?"
 
   if [ "$actual" = "$expected" ]; then
     echo "$input => $actual"
   else
+    echo "-----------------------------------"
+    echo "$input"
     echo "$expected expected, but got $actual"
     exit 1
   fi
@@ -134,14 +136,27 @@ try 0 'int main() { int **x; return 0; }'
 try 0 'int main() { int ***x; return 0; }'
 
 try 42 'int main() { int *p; p = alloc(42); return *p; }'
-
 try 42 'int main() { int *p; p = alloc(0); *p = 42; return *p; }'
 
 try 42 'int main() { int x; int *p; p = &x; *p = 42; return x; }'
+try 42 'int main() { int x; int *p; p = &x; *(p) = 42; return x; }'
+try 42 'int main() { int x; int *p; p = &x; *(p+0) = 42; return x; }'
+try 42 'int main() { int x; int *p; p = &x; *(p+1-1) = 42; return x; }'
 try 0 'int main() { int x; int *p; p = &x; debug(p); debug(p+1); return 0; }'
 try 8 'int main() { int *p; p = alloc1(3,5); return *p + *(p+1); }'
+try 5 'int main() { int *p; p = alloc1(3,5); return *(p+1); }'
+try 100 'int main() { int *p; p = alloc1(3,5); *(p+1) = 100; return *(p+1); }'
 try 8 'int main() { int *p; p = alloc1(3,5); return *p + *(1+p); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(p-1); }'
 try 9 'int main() { int *p; p = alloc2(2,7); return *p + *(-1+p); }'
 try 2 'int main() { int **p; p = alloc_ptr_ptr(2); return **p; }'
+
+try 103 'int add3( int x ) { int a; a = 3; return x + a; } int main() {int a; a = 100; return add3(a); }'
+
+try 4 'int main() { return sizeof 1; }'
+try 8 'int main() { int *p; return sizeof(p); }'
+try 8 'int main() { int *p; return sizeof(p+1); }'
+try 4 'int main() { int *p; return sizeof(*p); }'
+
+try 3 'int main() { int a[2]; *a = 1; *(a+1) = 2; int *p; p = a; return *p + *(p+1); }'
 echo OK
